@@ -5,8 +5,8 @@ const RestaurantContext = createContext()
 export function RestaurantProvider({children}){
     const [mesa,setMesa] = useState()
 
-    const ElegirMesa = (numMesa) =>{
-        setMesa(numMesa)
+    const ElegirMesa = (numMesass) =>{
+        setMesa(numMesass)
     }
 
     return(

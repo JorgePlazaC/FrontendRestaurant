@@ -3,7 +3,6 @@ import React from 'react'
 
 export default function Menu({navigation}) {
 
-  //const numMesa = route.params
 
   return (
     <View centerContent style = {styles.viewBody}>

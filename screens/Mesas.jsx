@@ -20,7 +20,7 @@ export default function Mesas() {
       <Button
       style={styles.button}
       title="Siguiente"
-      onPress={() => navigation.navigate("menu",numMesa)}
+      onPress={() => navigation.navigate("menu")}
       />              
     </View>
   )
