@@ -1,11 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, Text, View } from 'react-native'
 
-import RestaurantStack from './screens/navigation/RestaurantStack';
+import RestaurantStack from './screens/navigation/RestaurantStack'
+import { RestaurantProvider } from './src/components/RestaurantContext'
 
 export default function App() {
   return (
-    <RestaurantStack/>
+    <RestaurantProvider>
+      <RestaurantStack/>
+    </RestaurantProvider>
+    
   );
 }
 

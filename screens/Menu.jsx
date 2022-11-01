@@ -1,10 +1,9 @@
 import { StyleSheet, Text, View, Button } from 'react-native'
 import React from 'react'
-import { useNavigation } from '@react-navigation/native'
 
-export default function Menu() {
+export default function Menu({navigation}) {
 
-  const navigation = useNavigation()
+  //const numMesa = route.params
 
   return (
     <View centerContent style = {styles.viewBody}>
