@@ -6,6 +6,7 @@ import { RestaurantProvider } from './src/components/RestaurantContext'
 
 export default function App() {
   return (
+    
     <RestaurantProvider>
       <RestaurantStack/>
     </RestaurantProvider>
