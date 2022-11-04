@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 
 import RestaurantContext from '../src/components/RestaurantContext'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Mesas() {
 
@@ -49,7 +50,7 @@ const CargarMesas = () =>{
           <Button
             title={concatenacion}
             style={styles.button}
-            //onPress={ElegirMesa(mesa.numMesa)}
+            onPress={() =>{ElegirMesa(mesa.numMesa)}}
           />
           <Text> </Text>
         </View>
@@ -65,17 +66,13 @@ const ElegirMesa = (mesaElegida) =>{
 
 
   return (
-    <View centerContent style = {styles.viewBody}>
+    <SafeAreaView>
+      <View centerContent style = {styles.viewBody}>
       {cargando ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):(<View><Text>Mesas</Text>
-      {CargarMesas()}
-      <Button
-      style={styles.button}
-      title="Siguiente"
-      onPress={() => navigation.navigate("menu")}
-      />   
-      
+      {CargarMesas()}  
       </View>)}
     </View>
+    </SafeAreaView>
   )
 } 
 
