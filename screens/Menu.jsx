@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View, Button } from 'react-native'
+import { StyleSheet, Text, View, Button, SectionList } from 'react-native'
 import React, {useState,useEffect} from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
 
 export default function Menu({navigation}) {
@@ -16,43 +17,45 @@ export default function Menu({navigation}) {
   const fetchCategoriasProductos = async () => {
 
     let array = []
+    let arrayId = []
+    let arrayCategorias = []
 
     let objetoArray = {
-      categoria: "",
-      productos: []
+      title: "",
+      data: []
     }
 
     try{
       const response = await axios.get(urlCategorias)
 
-      let arrayCategorias = response.data
+      arrayCategorias = response.data
 
-      let cont = 0
       arrayCategorias.forEach(categoriaNueva => {
+        let nombre = categoriaNueva.nombre
         let id = categoriaNueva.id
+        let cont = id-1
         let catTemp = Object.create(objetoArray)
-        catTemp.categoria = id
+        catTemp.title = nombre
+        arrayId[cont] = id
         
         //console.log({catTemp})
         array.push(catTemp)
-        cont++
+        
       });
 
-      
-
-      let cont2 = 0
-      array.forEach(async categoria => {
-        let id = categoria.categoria
+      arrayId.forEach(async categoria => {
+        let id = categoria
         let nuevaUrl = urlProductos+"?idCategoria="+id
         const responseProductos = await axios.get(nuevaUrl)
-        console.log(responseProductos.data)
-        array[cont2].productos = responseProductos.data
-        cont2++
+        //console.log(responseProductos.data)
+        let cont = id-1
+        array[cont].data = responseProductos.data
+        //console.log(array[0].data)
       })
     
       setArrayProductos(array)
       setCargando(false)
-      //console.log(array)
+      //console.log(array[0].data)
     }catch(error){
       
       console.log(error)
@@ -65,18 +68,23 @@ export default function Menu({navigation}) {
   useEffect(() => {
     (async () =>{
       await fetchCategoriasProductos()
+      //console.log(arrayProductos[0].data)
     })()
 }, [])
 
-  return (
-    <View centerContent style = {styles.viewBody}>
-      <Text>Menú</Text>
+  return (         
+<SafeAreaView style={styles.container}>
+<View centerContent style = {styles.viewBody}>
+<Text>Menú</Text>
       <Button
       style={styles.button}
       title="Siguiente"
       onPress={() => navigation.navigate("resumen")}
-      />              
-    </View>
+      />   
+      
+        
+</View>
+</SafeAreaView>
   )
 }
 
