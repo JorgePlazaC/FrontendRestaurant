@@ -14,67 +14,105 @@ export default function Menu({navigation}) {
   const [arrayNombProductos,setArrayNombProductos] = useState(null)
   const [cargando,setCargando] = useState(true)
 
+
   // Invoking get method to perform a GET request
   const fetchCategoriasProductos = async () => {
-
-    let array = []
-    let arrayNombr = []
-    let arrayId = []
-    let arrayCategorias = []
-
     
-
     let objetoArray = {
       title: String,
       data: []
     }
+    /*
+    let objetoArray2 = {
+      title: String,
+      data: String
+    }
+    */
+    let array = [objetoArray]
+    let arrayNombr = []
+    let arrayId = []
+    let arrayCategorias = []
+    
 
     try{
       const response = await axios.get(urlCategorias)
 
       arrayCategorias = response.data
-
+      
+      
       arrayCategorias.forEach(categoriaNueva => {
         let nombre = categoriaNueva.nombre
         let id = categoriaNueva.id
         let cont = id-1
-        let catTemp = Object.create(objetoArray)
-        catTemp.title = nombre
-        arrayId[cont] = id
         
-        //console.log({catTemp})
-        array.push(catTemp)
-        arrayNombr.push(catTemp)
+        //let catTemp = Object.create(objetoArray)
+        //catTemp.title = nombre
+        
+        
+        arrayId[cont] = id
+        array[cont] = Object.create(objetoArray)
+        array[cont].title = nombre
+        
+        
+        //arrayNombr[cont] = Object.create(objetoArray2)
+        //arrayNombr[cont].title = nombre
+        
+        //console.log(array)
         
       });
-
-      arrayId.forEach(async categoria => {
-        let id = categoria
+      
+      arrayId.forEach(async id => {
+        
         let nuevaUrl = urlProductos+"?idCategoria="+id
         const responseProductos = await axios.get(nuevaUrl)
         //console.log(responseProductos.data)
         let cont = id-1
-        array[cont].data = responseProductos.data
-        arrayNombr[cont].data = LlenarArrayNombres(responseProductos.data)
-        //console.log(arrayNombr[0].data[0])
+        
+        array[cont].data =responseProductos.data
+        //arrayNombr[cont].data = LlenarArrayNombres(responseProductos.data,cont)
+        //catTemp[cont].data.push(responseProductos.data)
+        //console.log(array[0].data[0])
+        //console.log(responseProductos.data)
+        //console.log(array[0].data)
+        /*
+        if(cont+1 == arrayId.length){
+          setArrayProductos(array)
+          setCargando(false)
+          if(arrayProductos != null){
+            //setCargando(false)
+            //console.log(cargando)
+          }
+          //setArrayNombProductos(arrayNombr)
+          //console.log(arrayProductos)
+          
+        }
+        */
+       
       })
-      //console.log(arrayNombr[0].data[0])
+      
+      //console.log("PASO ultimo")
       setArrayProductos(array)
-      setArrayNombProductos(arrayNombr)
+      //setArrayNombProductos(arrayNombr)
       setCargando(false)
-      //console.log(arrayNombr[0].data[0])
+      console.log(arrayProductos)
+      console.log(cargando)
+      
     }catch(error){
       
       console.log(error)
       console.log({urlProductos})
+      console.log(arrayProductos)
+      console.log(cargando)
     }
     
   }
 
-  const LlenarArrayNombres = (productos) =>{
-    let arrayProd = []
+  const LlenarArrayNombres = (productos,cont) =>{
+    const arrayProd = [objetoArray2]
+    let cont2 = productos.length
     productos.forEach(producto =>{
-      arrayProd.push(producto.nombre)
+      
+      arrayProd[cont].data[cont2] = producto.nombre
     })
     return arrayProd
   }
@@ -83,15 +121,16 @@ export default function Menu({navigation}) {
   useEffect(() => {
     (async () =>{
       await fetchCategoriasProductos()
-      //console.log(arrayProductos[0].data)
-      //console.log(arrayNombProductos[1].data[1])
+      //console.log(arrayProductos)
+      //console.log(arrayProductos)
     })()
 }, [])
+
 
 const Item = ({ title }) => (
   
   <View >
-    <Text style={styles.title}>{title}</Text>
+    <Text style={styles.title}>{title.id}</Text>
   </View>
 );
 
@@ -114,30 +153,51 @@ const DATA = [
   }
 ];
 
-const debugging = () =>{
-  console.log(arrayNombProductos[0].data[0])
+const debuging = () =>{
+  console.log(arrayProductos[0].data[0].id)
+  console.log(cargando)
 }
+
 
   return (         
 <SafeAreaView style={styles.container}>
 <View centerContent style = {styles.viewBody}>
-{cargando ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):(<View><Text>Menú</Text>
+{cargando == true ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):(<View><Text>Menú</Text>
       <Button
       style={styles.button}
       title="Siguiente"
       onPress={() => navigation.navigate("resumen")}
       />   
-      <SectionList
-      sections={arrayNombProductos}
+      <Button
+      style={styles.button}
+      title="Verificar"
+      onPress={debuging}
+      />   
+
+<SectionList
+        sections={arrayProductos}
+        renderItem={({item})=>(
+          <View><Text></Text>
+          <Text style={styles.taskItem}>{item.nombre}</Text></View>
+          
+        )}
+        renderSectionHeader={({section})=>(
+          <Text style={styles.taskTitle}>{section.title}</Text>
+        )}
+        keyExtractor={item=>item.id}
+        stickySectionHeadersEnabled
+      />
+
+
+<SectionList
+      sections={arrayProductos}
       keyExtractor={(item, index) => item + index}
       renderSectionHeader={({ section: { title } }) => (
         <Text style={styles.header}>{title}</Text>
       )}
       renderItem={({ item }) => <Item title={item} />}
-      />
-      {debugging()}
+    />
       </View>)}
-        
 </View>
 </SafeAreaView>
   )
