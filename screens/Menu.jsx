@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, SectionList, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Button, SectionList, ActivityIndicator, FlatList, ListItem } from 'react-native'
 import React, {useState,useEffect} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
@@ -8,56 +8,39 @@ export default function Menu({navigation}) {
   const baseUrl = 'http://10.0.2.2:8000'
   const urlCategorias = `${baseUrl}/api/categorias`
   const urlProductos = `${baseUrl}/api/buscarPorCategoria`
+  const urlTodosProductos = `${baseUrl}/api/productos`
   
   
-  const [arrayProductos,setArrayProductos] = useState(null)
-  const [arrayNombProductos,setArrayNombProductos] = useState(null)
+  const [arrayProductos,setArrayProductos] = useState([])
   const [cargando,setCargando] = useState(true)
+  const [obtenerMenuApi,setObtenerMenuApi] = useState(true)
+  const [productos,setProductos] = useState([])
+  let objetoArray = {
+    title: String,
+    data: []
+  }
 
-
+  
   // Invoking get method to perform a GET request
   const fetchCategoriasProductos = async () => {
     
-    let objetoArray = {
-      title: String,
-      data: []
-    }
-    /*
-    let objetoArray2 = {
-      title: String,
-      data: String
-    }
-    */
     let array = [objetoArray]
-    let arrayNombr = []
-    let arrayId = []
-    let arrayCategorias = []
-    
-
+  let arrayId = []
+  let arrayCategorias = []
+  let arrayTodosProductos = []
     try{
       const response = await axios.get(urlCategorias)
 
       arrayCategorias = response.data
-      
       
       arrayCategorias.forEach(categoriaNueva => {
         let nombre = categoriaNueva.nombre
         let id = categoriaNueva.id
         let cont = id-1
         
-        //let catTemp = Object.create(objetoArray)
-        //catTemp.title = nombre
-        
-        
         arrayId[cont] = id
         array[cont] = Object.create(objetoArray)
         array[cont].title = nombre
-        
-        
-        //arrayNombr[cont] = Object.create(objetoArray2)
-        //arrayNombr[cont].title = nombre
-        
-        //console.log(array)
         
       });
       
@@ -65,34 +48,26 @@ export default function Menu({navigation}) {
         
         let nuevaUrl = urlProductos+"?idCategoria="+id
         const responseProductos = await axios.get(nuevaUrl)
-        //console.log(responseProductos.data)
+        
         let cont = id-1
         
-        array[cont].data =responseProductos.data
-        //arrayNombr[cont].data = LlenarArrayNombres(responseProductos.data,cont)
-        //catTemp[cont].data.push(responseProductos.data)
-        //console.log(array[0].data[0])
-        //console.log(responseProductos.data)
-        //console.log(array[0].data)
         /*
-        if(cont+1 == arrayId.length){
-          setArrayProductos(array)
-          setCargando(false)
-          if(arrayProductos != null){
-            //setCargando(false)
-            //console.log(cargando)
-          }
-          //setArrayNombProductos(arrayNombr)
-          //console.log(arrayProductos)
-          
-        }
+        responseProductos.data.forEach(producto => {
+          array[cont].data.push(producto)
+        })
         */
-       
+
+        array[cont].data =responseProductos.data
+
       })
       
-      //console.log("PASO ultimo")
+      const responseTodosPr = await axios.get(urlTodosProductos)
+
+      arrayTodosProductos = responseTodosPr.data
+      setProductos(arrayTodosProductos)
+     
       setArrayProductos(array)
-      //setArrayNombProductos(arrayNombr)
+      
       setCargando(false)
       console.log(arrayProductos)
       console.log(cargando)
@@ -107,24 +82,19 @@ export default function Menu({navigation}) {
     
   }
 
-  const LlenarArrayNombres = (productos,cont) =>{
-    const arrayProd = [objetoArray2]
-    let cont2 = productos.length
-    productos.forEach(producto =>{
-      
-      arrayProd[cont].data[cont2] = producto.nombre
-    })
-    return arrayProd
-  }
-
 
   useEffect(() => {
-    (async () =>{
+    const ConsultarMenuApi = async () =>{
       await fetchCategoriasProductos()
+      setObtenerMenuApi(false)
       //console.log(arrayProductos)
       //console.log(arrayProductos)
-    })()
+    }
+    if(obtenerMenuApi){
+      ConsultarMenuApi()
+    }
 }, [])
+
 
 
 const Item = ({ title }) => (
@@ -153,8 +123,8 @@ const DATA = [
   }
 ];
 
-const debuging = () =>{
-  console.log(arrayProductos[0].data[0].id)
+const ShowInfo = () =>{
+  console.log(arrayProductos[0].data[0])
   console.log(cargando)
 }
 
@@ -171,14 +141,20 @@ const debuging = () =>{
       <Button
       style={styles.button}
       title="Verificar"
-      onPress={debuging}
+      onPress={ShowInfo}
       />   
+      
+      
+      
+      
 
 <SectionList
         sections={arrayProductos}
         renderItem={({item})=>(
           <View><Text></Text>
-          <Text style={styles.taskItem}>{item.nombre}</Text></View>
+          <Text style={styles.taskItem}>{item.nombre}</Text>
+          
+          </View>
           
         )}
         renderSectionHeader={({section})=>(
