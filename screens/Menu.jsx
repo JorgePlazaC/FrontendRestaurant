@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View, Button, SectionList, ActivityIndicator, FlatList, ListItem } from 'react-native'
-import React, {useState,useEffect} from 'react'
+import React, {useState,useEffect,useContext} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
+
+import RestaurantContext from '../src/components/RestaurantContext'
 
 export default function Menu({navigation}) {
 
@@ -9,6 +11,7 @@ export default function Menu({navigation}) {
   const urlCategorias = `${baseUrl}/api/categorias`
   const urlProductos = `${baseUrl}/api/buscarPorCategoria`
   const urlTodosProductos = `${baseUrl}/api/productos`
+  const {mesa, setMesa} = useContext(RestaurantContext)
   
   
   const [arrayProductos,setArrayProductos] = useState([])
@@ -74,7 +77,7 @@ export default function Menu({navigation}) {
     
   }
 
-  
+
 
 useEffect(() => {
   const ConsultarMenuApi = async () =>{
@@ -103,6 +106,8 @@ const Item = ({ title }) => (
 <View centerContent style = {styles.viewBody}>
 {cargando == true && arrayProductos[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):
 (<View> 
+  <Text>Mesa número: {mesa}</Text>
+  <Text></Text>
 <SectionList
       sections={arrayProductos}
       keyExtractor={(item, index) => item + index}
