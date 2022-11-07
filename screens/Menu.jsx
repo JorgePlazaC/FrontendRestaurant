@@ -33,10 +33,10 @@ export default function Menu({navigation}) {
 
       arrayCategorias = response.data
       
-      arrayCategorias.forEach(categoriaNueva => {
+      arrayCategorias.forEach((categoriaNueva,index) => {
         let nombre = categoriaNueva.nombre
         let id = categoriaNueva.id
-        let cont = id-1
+        let cont = index
         
         arrayId[cont] = id
         array[cont] = Object.create(objetoArray)
@@ -78,7 +78,7 @@ export default function Menu({navigation}) {
 
 useEffect(() => {
   const ConsultarMenuApi = async () =>{
-    await fetchCategoriasProductos().finally(setTimeout(() => setCargando(false), 500))
+    await fetchCategoriasProductos().finally(setCargando(false))
     setObtenerMenuApi(false)
     //console.log(arrayProductos)
     //console.log(arrayProductos)
@@ -93,71 +93,16 @@ useEffect(() => {
 const Item = ({ title }) => (
   
   <View >
-    <Text style={styles.title}>{title.id}</Text>
+    <Text style={styles.title}>{title.nombre}</Text>
   </View>
 );
-
-const DATA = [
-  {
-    title: "Main dishes",
-    data: ["Pizza", "Burger", "Risotto"]
-  },
-  {
-    title: "Sides",
-    data: ["French Fries", "Onion Rings", "Fried Shrimps"]
-  },
-  {
-    title: "Drinks",
-    data: ["Water", "Coke", "Beer"]
-  },
-  {
-    title: "Desserts",
-    data: ["Cheese Cake", "Ice Cream"]
-  }
-];
-
-const ShowInfo = () =>{
-  //console.log(arrayProductos[0].data[0])
-  console.log(cargando)
-}
 
 
   return (         
 <SafeAreaView style={styles.container}>
 <View centerContent style = {styles.viewBody}>
-{cargando == true && arrayProductos[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):(<View><Text>Menú</Text>
-      <Button
-      style={styles.button}
-      title="Siguiente"
-      onPress={() => navigation.navigate("resumen")}
-      />   
-      <Button
-      style={styles.button}
-      title="Verificar"
-      onPress={ShowInfo}
-      />   
-      
-      
-      
-      
-
-<SectionList
-        sections={arrayProductos}
-        renderItem={({item})=>(
-          <View><Text></Text>
-          <Text style={styles.taskItem}>{item.nombre}</Text>
-          
-          </View>
-          
-        )}
-        renderSectionHeader={({section})=>(
-          <Text style={styles.taskTitle}>{section.title}</Text>
-        )}
-        keyExtractor={item=>item.id}
-        stickySectionHeadersEnabled
-      />
-
-
+{cargando == true && arrayProductos[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):
+(<View> 
 <SectionList
       sections={arrayProductos}
       keyExtractor={(item, index) => item + index}
@@ -166,6 +111,11 @@ const ShowInfo = () =>{
       )}
       renderItem={({ item }) => <Item title={item} />}
     />
+    <Button
+      style={styles.button}
+      title="Siguiente"
+      onPress={() => navigation.navigate("resumen")}
+      />  
       </View>)}
 </View>
 </SafeAreaView>
