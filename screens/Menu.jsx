@@ -51,24 +51,16 @@ export default function Menu({navigation}) {
         
         let cont = id-1
         
-        /*
-        responseProductos.data.forEach(producto => {
-          array[cont].data.push(producto)
-        })
-        */
-
         array[cont].data =responseProductos.data
 
       })
-      
+      setArrayProductos(array)
       const responseTodosPr = await axios.get(urlTodosProductos)
 
       arrayTodosProductos = responseTodosPr.data
       setProductos(arrayTodosProductos)
-     
-      setArrayProductos(array)
-      
-      setCargando(false)
+
+      //setCargando(false)
       console.log(arrayProductos)
       console.log(cargando)
       
@@ -82,17 +74,18 @@ export default function Menu({navigation}) {
     
   }
 
+  
 
-  useEffect(() => {
-    const ConsultarMenuApi = async () =>{
-      await fetchCategoriasProductos()
-      setObtenerMenuApi(false)
-      //console.log(arrayProductos)
-      //console.log(arrayProductos)
-    }
-    if(obtenerMenuApi){
-      ConsultarMenuApi()
-    }
+useEffect(() => {
+  const ConsultarMenuApi = async () =>{
+    await fetchCategoriasProductos().finally(setTimeout(() => setCargando(false), 500))
+    setObtenerMenuApi(false)
+    //console.log(arrayProductos)
+    //console.log(arrayProductos)
+  }
+  if(obtenerMenuApi){
+    ConsultarMenuApi()
+  }
 }, [])
 
 
@@ -124,7 +117,7 @@ const DATA = [
 ];
 
 const ShowInfo = () =>{
-  console.log(arrayProductos[0].data[0])
+  //console.log(arrayProductos[0].data[0])
   console.log(cargando)
 }
 
@@ -132,7 +125,7 @@ const ShowInfo = () =>{
   return (         
 <SafeAreaView style={styles.container}>
 <View centerContent style = {styles.viewBody}>
-{cargando == true ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):(<View><Text>Menú</Text>
+{cargando == true && arrayProductos[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):(<View><Text>Menú</Text>
       <Button
       style={styles.button}
       title="Siguiente"
