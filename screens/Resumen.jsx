@@ -1,15 +1,37 @@
-import { StyleSheet, Text, View, Button } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Button, FlatList, ActivityIndicator, Dimensions, ListItem,StatusBar } from 'react-native'
+import React, {useState,useEffect,useContext} from 'react'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import axios from 'axios'
+
+import RestaurantContext from '../src/components/RestaurantContext'
+
+const width = Dimensions.get('window')
 
 export default function Resumen({navigation}) {
 
+  const {mesa, setMesa, carro, setCarro} = useContext(RestaurantContext)
+
+  const Item = ({ title }) => (
+    <View style={styles.item}>
+      <Text style={styles.title}>{title.nombre}</Text>
+      <Text style={styles.title}>{title.precio}</Text>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <Item title={item} />
+  )
 
   return (
     <View centerContent style = {styles.viewBody}>
-      <Text>Resumen</Text>
+      <FlatList
+        data={carro}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+      />
       <Button
       style={styles.button}
-      title="Siguiente"
+      title="Confirmar"
       onPress={() => navigation.navigate("espera")}
       />              
     </View>

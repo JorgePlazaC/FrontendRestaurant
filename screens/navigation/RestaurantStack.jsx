@@ -33,7 +33,7 @@ export default function RestaurantStack() {
             <Stack.Screen
                 name="espera"
                 component={Espera}
-                options={{title:"Espera"}}
+                options={{title:"Espera",headerLeft:null}}
             />
         </Stack.Navigator>
     </NavigationContainer>

@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View, Button, SectionList, ActivityIndicator, FlatList, ListItem } from 'react-native'
+import { StyleSheet, Text, View, Button, SectionList, ActivityIndicator, Dimensions, ListItem,StatusBar } from 'react-native'
 import React, {useState,useEffect,useContext} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
 
 import RestaurantContext from '../src/components/RestaurantContext'
+
+const width = Dimensions.get('window')
 
 export default function Menu({navigation}) {
 
@@ -11,13 +13,15 @@ export default function Menu({navigation}) {
   const urlCategorias = `${baseUrl}/api/categorias`
   const urlProductos = `${baseUrl}/api/buscarPorCategoria`
   const urlTodosProductos = `${baseUrl}/api/productos`
-  const {mesa, setMesa} = useContext(RestaurantContext)
+  const {mesa, setMesa, carro, setCarro} = useContext(RestaurantContext)
+ 
   
   
   const [arrayProductos,setArrayProductos] = useState([])
   const [cargando,setCargando] = useState(true)
   const [obtenerMenuApi,setObtenerMenuApi] = useState(true)
   const [productos,setProductos] = useState([])
+  const arrayCarro = []
   let objetoArray = {
     title: String,
     data: []
@@ -95,32 +99,49 @@ useEffect(() => {
 
 const Item = ({ title }) => (
   
-  <View >
-    <Text style={styles.title}>{title.nombre}</Text>
+  <View style = {styles.container}>
+    <Text style={styles.textSection}>{title.nombre}</Text>
+    <Button
+      style={styles.buttonSection}
+      title="Agregar"
+      onPress={() => {AgregarAlCarro(title)}}
+      />  
   </View>
 );
 
+const AgregarAlCarro = (producto) =>{
+  arrayCarro.push(producto)
+  console.log(arrayCarro)
+}
+
+const ConfirmarCarro = () =>{
+  setCarro(arrayCarro)
+  navigation.navigate("resumen")
+}
+
 
   return (         
-<SafeAreaView style={styles.container}>
+<SafeAreaView >
 <View centerContent style = {styles.viewBody}>
 {cargando == true && arrayProductos[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):
 (<View> 
-  <Text>Mesa número: {mesa}</Text>
-  <Text></Text>
+  
 <SectionList
+style = {styles.sectionList}
       sections={arrayProductos}
       keyExtractor={(item, index) => item + index}
       renderSectionHeader={({ section: { title } }) => (
         <Text style={styles.header}>{title}</Text>
       )}
       renderItem={({ item }) => <Item title={item} />}
+      stickySectionHeadersEnabled
     />
     <Button
       style={styles.button}
       title="Siguiente"
-      onPress={() => navigation.navigate("resumen")}
+      onPress={() => {ConfirmarCarro()}}
       />  
+      
       </View>)}
 </View>
 </SafeAreaView>
@@ -128,8 +149,14 @@ const Item = ({ title }) => (
 }
 
 const styles = StyleSheet.create({
+  container: {
+    display: "flex", 
+    flexDirection: 'row', 
+    flexGrow: 0,
+    
+  },
   viewBody:{
-    marginHorizontal: 30
+    marginHorizontal: 30,
     },
     button:{
         backgroundColor: "#442484"
@@ -145,5 +172,15 @@ const styles = StyleSheet.create({
     },
     title: {
       fontSize: 24
+    },
+    textSection: {
+      flex: 0.75, 
+      height: 30
+    },
+    buttonSection: {
+      flex: 0.25
+    },
+    sectionList: {
+      maxHeight: width.height-150,
     }
 })
