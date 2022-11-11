@@ -50,7 +50,7 @@ const CargarMesas = () =>{
           <Button
             title={concatenacion}
             style={styles.button}
-            onPress={() =>{ElegirMesa(mesa.numMesa)}}
+            onPress={() =>{ElegirMesa(mesa)}}
           />
           <Text> </Text>
         </View>

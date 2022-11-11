@@ -28,7 +28,6 @@ export default function Menu({navigation}) {
   }
 
   let Carro = {
-    idMesa: String,
     producto: Object,
     cantidad: Number,
     idFactura: String
@@ -120,7 +119,6 @@ const AgregarAlCarro = (producto) =>{
   let encontrado = true
   if(arrayCarro[0] === undefined){
     let pedido = Object.create(Carro)
-    pedido.idMesa = mesa
     pedido.producto = producto
     pedido.cantidad = 1
     arrayCarro[0] = pedido
@@ -140,7 +138,6 @@ const AgregarAlCarro = (producto) =>{
 
   if(encontrado){
     let pedido = Object.create(Carro)
-  pedido.idMesa = mesa
   pedido.producto = producto
   pedido.cantidad = 1
   arrayCarro.push(pedido)
