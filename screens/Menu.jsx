@@ -21,10 +21,17 @@ export default function Menu({navigation}) {
   const [cargando,setCargando] = useState(true)
   const [obtenerMenuApi,setObtenerMenuApi] = useState(true)
   const [productos,setProductos] = useState([])
-  const arrayCarro = []
+  const arrayCarro = [Carro]
   let objetoArray = {
     title: String,
     data: []
+  }
+
+  let Carro = {
+    idMesa: String,
+    producto: Object,
+    cantidad: Number,
+    idFactura: String
   }
 
   
@@ -110,7 +117,35 @@ const Item = ({ title }) => (
 );
 
 const AgregarAlCarro = (producto) =>{
-  arrayCarro.push(producto)
+  let encontrado = true
+  if(arrayCarro[0] === undefined){
+    let pedido = Object.create(Carro)
+    pedido.idMesa = mesa
+    pedido.producto = producto
+    pedido.cantidad = 1
+    arrayCarro[0] = pedido
+    encontrado = false
+  }
+
+  if(encontrado){
+    arrayCarro.forEach((element,index) =>{
+      if(element.producto.id === producto.id){
+        arrayCarro[index].cantidad++
+        //element.producto.cantidad++
+        encontrado = false
+        
+      }
+    })
+  }
+
+  if(encontrado){
+    let pedido = Object.create(Carro)
+  pedido.idMesa = mesa
+  pedido.producto = producto
+  pedido.cantidad = 1
+  arrayCarro.push(pedido)
+  }
+
   console.log(arrayCarro)
 }
 

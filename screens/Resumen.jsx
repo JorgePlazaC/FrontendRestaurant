@@ -10,11 +10,18 @@ const width = Dimensions.get('window')
 export default function Resumen({navigation}) {
 
   const {mesa, setMesa, carro, setCarro} = useContext(RestaurantContext)
+  
+
+  useEffect(() => {
+    
+}, [])
+
 
   const Item = ({ title }) => (
     <View style={styles.item}>
-      <Text style={styles.title}>{title.nombre}</Text>
-      <Text style={styles.title}>{title.precio}</Text>
+      <Text style={styles.title}>{title.producto.nombre}</Text>
+      <Text style={styles.title}>{title.producto.precio}</Text>
+      <Text style={styles.title}>{title.cantidad}</Text>
     </View>
   );
 
