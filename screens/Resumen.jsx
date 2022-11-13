@@ -37,9 +37,11 @@ export default function Resumen({navigation}) {
       const responseFactura = await axios.post(urlFactura, {valorTotal:total})
       const facturaId = responseFactura.data.id
       
-      
+      console.log(facturaId)
+      console.log(mesa.id)
       carro.forEach(async (prod) =>{
       const response = await axios.post(urlPedido, {idMesa:mesa.id,idFactura:facturaId,idProducto:prod.producto.id,cantidad:prod.cantidad});
+      
     })
     
     } catch (error) {

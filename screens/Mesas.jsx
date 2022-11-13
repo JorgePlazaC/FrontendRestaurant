@@ -51,7 +51,7 @@ const Item = ({ title }) => (
     <Button
       title={`Mesa ${title.numMesa}`}
       style={styles.button}
-      onPress={() =>{ElegirMesa(mesa)}}
+      onPress={() =>{ElegirMesa(title)}}
       />
       <Text> </Text>
   </View>

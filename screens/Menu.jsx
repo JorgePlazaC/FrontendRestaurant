@@ -107,8 +107,15 @@ const AgregarAlCarro = (producto) =>{
 
   //Vaciar info carro
   carro.forEach(elementCarro => {
-    arrayCarro.push(elementCarro)
+    if(arrayCarro[0] === undefined){
+      arrayCarro[0] = elementCarro
+    }else{
+      arrayCarro.push(elementCarro)
+    }
+    
   })
+
+  console.log(arrayCarro)
 
   let encontrado = true
   if(arrayCarro[0] === undefined){
@@ -137,6 +144,7 @@ const AgregarAlCarro = (producto) =>{
   arrayCarro.push(pedido)
   }
   setCarro(arrayCarro)
+  ContProductos(producto)
   console.log(arrayCarro)
 }
 
@@ -169,16 +177,24 @@ const ConfirmarCarro = () =>{
 }
 
 const ContProductos = (producto) => {
-  if(arrayCarro[0] === undefined){
-    return 0
-  }
-  arrayCarro.forEach(elementCont =>{
-    if(elementCont.producto.id === producto.id){
-      return elementCont.cantidad
+  let arrayTemp = []
+  arrayProductos.forEach(element =>{
+    if(arrayTemp[0] === undefined){
+      arrayTemp[0] = element
     } else{
-      return 0
+      arrayTemp.push(element)
     }
   })
+  
+  arrayTemp.forEach((categoria) =>{
+    categoria.data.forEach((productoCategoria)=>{
+      if(producto.id === productoCategoria.id){
+        productoCategoria.stock++
+      }
+    })
+  })
+
+  setArrayProductos(arrayTemp)
 }
 
 const Item = ({ title }) => (
@@ -189,7 +205,7 @@ const Item = ({ title }) => (
       title="-"
       onPress={() => {EliminarDelCarro(title)}}
       /> 
-    <Text style = {styles.textCont}>{ContProductos(title)}</Text>
+    <Text style = {styles.textCont}>{title.stock}</Text>
     <Button
       style={styles.buttonAgregar}
       title="+"
