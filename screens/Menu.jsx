@@ -13,7 +13,7 @@ export default function Menu({navigation}) {
   const urlCategorias = `${baseUrl}/api/categorias`
   const urlProductos = `${baseUrl}/api/buscarPorCategoria`
   const urlTodosProductos = `${baseUrl}/api/productos`
-  const {mesa, setMesa, carro, setCarro} = useContext(RestaurantContext)
+  const {mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado} = useContext(RestaurantContext)
  
   
   
@@ -21,7 +21,8 @@ export default function Menu({navigation}) {
   const [cargando,setCargando] = useState(true)
   const [obtenerMenuApi,setObtenerMenuApi] = useState(true)
   const [productos,setProductos] = useState([])
-  const arrayCarro = [Carro]
+  const [actualizar,setActualizar] = useState()
+  let arrayCarro = [Carro]
   let objetoArray = {
     title: String,
     data: []
@@ -101,21 +102,14 @@ useEffect(() => {
   }
 }, [])
 
-
-
-const Item = ({ title }) => (
-  
-  <View style = {styles.container}>
-    <Text style={styles.textSection}>{title.nombre}</Text>
-    <Button
-      style={styles.buttonSection}
-      title="Agregar"
-      onPress={() => {AgregarAlCarro(title)}}
-      />  
-  </View>
-);
-
 const AgregarAlCarro = (producto) =>{
+
+
+  //Vaciar info carro
+  carro.forEach(elementCarro => {
+    arrayCarro.push(elementCarro)
+  })
+
   let encontrado = true
   if(arrayCarro[0] === undefined){
     let pedido = Object.create(Carro)
@@ -142,14 +136,67 @@ const AgregarAlCarro = (producto) =>{
   pedido.cantidad = 1
   arrayCarro.push(pedido)
   }
-
+  setCarro(arrayCarro)
   console.log(arrayCarro)
 }
 
-const ConfirmarCarro = () =>{
-  setCarro(arrayCarro)
-  navigation.navigate("resumen")
+//FALTA ELIMINAR EL PRODUCTO EN CASO QUE SEA LA ULTIMA UNIDAD
+
+const EliminarDelCarro = (producto) =>{
+  carro.forEach(elementCarro => {
+    if(arrayCarro[0] === undefined){
+      arrayCarro[0]= elementCarro
+    } else{
+      arrayCarro.push(elementCarro)
+    }
+    
+  })
+  arrayCarro.forEach((element,index) =>{
+    console.log(arrayCarro)
+    if(element.producto.id === producto.id){
+      element.cantidad--
+    }
+  })
 }
+
+const ConfirmarCarro = () =>{
+  if(carroAgregado){
+    navigation.navigate("resumen")
+  } else{
+  setCarroAgregado(true)
+  navigation.navigate("resumen")
+  }
+}
+
+const ContProductos = (producto) => {
+  if(arrayCarro[0] === undefined){
+    return 0
+  }
+  arrayCarro.forEach(elementCont =>{
+    if(elementCont.producto.id === producto.id){
+      return elementCont.cantidad
+    } else{
+      return 0
+    }
+  })
+}
+
+const Item = ({ title }) => (
+  <View style = {styles.container}>
+    <Text style={styles.textSection}>{title.nombre}</Text>
+    <Button
+      style={styles.buttonEliminar}
+      title="-"
+      onPress={() => {EliminarDelCarro(title)}}
+      /> 
+    <Text style = {styles.textCont}>{ContProductos(title)}</Text>
+    <Button
+      style={styles.buttonAgregar}
+      title="+"
+      onPress={() => {AgregarAlCarro(title)}}
+      /> 
+  </View>
+)
 
 
   return (         
@@ -206,11 +253,18 @@ const styles = StyleSheet.create({
       fontSize: 24
     },
     textSection: {
-      flex: 0.75, 
+      flex: 0.9, 
       height: 30
     },
-    buttonSection: {
-      flex: 0.25
+    buttonAgregar: {
+      flex: 0.25,
+    },
+    buttonEliminar: {
+      flex: 0.25,
+    },
+    textCont: {
+      flex: 0.13,
+      textAlign: 'center',
     },
     sectionList: {
       maxHeight: width.height-150,

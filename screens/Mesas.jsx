@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View, Button, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Button, ActivityIndicator, FlatList, Dimensions } from 'react-native'
 import React, {useState,useEffect,useContext} from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 
 import RestaurantContext from '../src/components/RestaurantContext'
 import { SafeAreaView } from 'react-native-safe-area-context'
+
+const width = Dimensions.get('window')
 
 export default function Mesas() {
 
@@ -39,43 +41,42 @@ const fetchMesas = async () => {
   
 }
 
-const CargarMesas = () =>{
-
-  if(cargando == false){
-    console.log("Cargando mesas")
-    return array.map((mesa,i) =>{
-      const concatenacion = "Mesa "+mesa.numMesa
-      return (
-        <View key={i}>
-          <Button
-            title={concatenacion}
-            style={styles.button}
-            onPress={() =>{ElegirMesa(mesa)}}
-          />
-          <Text> </Text>
-        </View>
-      )
-    })
-  }
-}
-
 const ElegirMesa = (mesaElegida) =>{
   setMesa(mesaElegida)
   navigation.navigate("menu")
 }
 
+const Item = ({ title }) => (
+  <View style={styles.item}>
+    <Button
+      title={`Mesa ${title.numMesa}`}
+      style={styles.button}
+      onPress={() =>{ElegirMesa(mesa)}}
+      />
+      <Text> </Text>
+  </View>
+);
+
+const renderItem = ({ item }) => (
+  <Item title={item} />
+)
 
   return (
     <SafeAreaView>
       <View centerContent style = {styles.viewBody}>
-      {cargando ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):(<View><Text>Mesas</Text>
-      {CargarMesas()}  
+      {cargando ? (<View><Text>Cargando</Text><ActivityIndicator /></View>):
+      (<View>
+        <FlatList
+        style = {styles.flatList}
+        data={array}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+      /> 
       </View>)}
     </View>
     </SafeAreaView>
   )
 } 
-
 
 const styles = StyleSheet.create({
   viewBody:{
@@ -84,5 +85,8 @@ const styles = StyleSheet.create({
     button:{
         backgroundColor: "#442484",
         paddingTop: 10
+    },
+    sectionList: {
+      maxHeight: width.height-150,
     }
 })

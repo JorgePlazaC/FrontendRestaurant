@@ -24,8 +24,8 @@ export default function Resumen({navigation}) {
 
   const CalcTotal = () =>{
     let calc = 0
-    carro.forEach(element => {
-      let suma = element.producto.precio*element.cantidad
+    carro.forEach(elementCarroR => {
+      let suma = elementCarroR.producto.precio*elementCarroR.cantidad
       calc = calc + suma
     })
     total = calc
@@ -39,10 +39,6 @@ export default function Resumen({navigation}) {
       
       
       carro.forEach(async (prod) =>{
-      console.log(mesa.id)
-      console.log(facturaId)
-      console.log(prod.producto.id)
-      console.log(prod.cantidad)
       const response = await axios.post(urlPedido, {idMesa:mesa.id,idFactura:facturaId,idProducto:prod.producto.id,cantidad:prod.cantidad});
     })
     
