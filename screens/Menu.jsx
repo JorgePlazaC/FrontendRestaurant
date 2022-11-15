@@ -144,14 +144,14 @@ const AgregarAlCarro = (producto) =>{
   arrayCarro.push(pedido)
   }
   setCarro(arrayCarro)
-  ContProductos(producto)
+  ContProductos(producto,true)
   console.log(arrayCarro)
 }
 
 //FALTA ELIMINAR EL PRODUCTO EN CASO QUE SEA LA ULTIMA UNIDAD
 
 const EliminarDelCarro = (producto) =>{
-  /*
+  //Vaciado de datos
   carro.forEach(elementCarro => {
     if(arrayCarro[0] === undefined){
       arrayCarro[0]= elementCarro
@@ -160,13 +160,25 @@ const EliminarDelCarro = (producto) =>{
     }
     
   })
-  arrayCarro.forEach((element,index) =>{
-    console.log(arrayCarro)
-    if(element.producto.id === producto.id){
-      element.cantidad--
-    }
-  })
-  */
+
+  //Buscar el producto a eliminar
+  if(arrayCarro[0] != undefined){
+    arrayCarro.forEach((element,index) =>{
+      console.log(arrayCarro)
+      if(element.producto.id === producto.id){
+        if(element.cantidad > 1){
+          element.cantidad--
+          console.log(element.cantidad)
+          ContProductos(producto,false)
+        } else if(element.cantidad === 1){
+          //element.slice(index,index+1)
+          ContProductos(producto,false)
+          arrayCarro.splice(index,1)
+        }
+      }
+    })
+  }
+  setCarro(arrayCarro)
 }
 
 const ConfirmarCarro = () =>{
@@ -178,7 +190,7 @@ const ConfirmarCarro = () =>{
   }
 }
 
-const ContProductos = (producto) => {
+const ContProductos = (producto,accion) => {
   let arrayTemp = []
   arrayProductos.forEach(element =>{
     if(arrayTemp[0] === undefined){
@@ -188,14 +200,24 @@ const ContProductos = (producto) => {
     }
   })
   
-  arrayTemp.forEach((categoria) =>{
-    categoria.data.forEach((productoCategoria)=>{
-      if(producto.id === productoCategoria.id){
-        productoCategoria.stock++
-      }
+  if(accion){
+    arrayTemp.forEach((categoria) =>{
+      categoria.data.forEach((productoCategoria)=>{
+        if(producto.id === productoCategoria.id){
+          productoCategoria.stock++
+        }
+      })
     })
-  })
-
+  } else{
+    arrayTemp.forEach((categoria) =>{
+      categoria.data.forEach((productoCategoria)=>{
+        if(producto.id === productoCategoria.id){
+          productoCategoria.stock--
+        }
+      })
+    })
+  }
+  
   setArrayProductos(arrayTemp)
 }
 
