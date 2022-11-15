@@ -151,6 +151,7 @@ const AgregarAlCarro = (producto) =>{
 //FALTA ELIMINAR EL PRODUCTO EN CASO QUE SEA LA ULTIMA UNIDAD
 
 const EliminarDelCarro = (producto) =>{
+  /*
   carro.forEach(elementCarro => {
     if(arrayCarro[0] === undefined){
       arrayCarro[0]= elementCarro
@@ -165,6 +166,7 @@ const EliminarDelCarro = (producto) =>{
       element.cantidad--
     }
   })
+  */
 }
 
 const ConfirmarCarro = () =>{
