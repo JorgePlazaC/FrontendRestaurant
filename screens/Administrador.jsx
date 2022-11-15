@@ -9,7 +9,21 @@ export default function Administrador() {
   return (
     <View style = {styles.viewBody}>
       <Text>Administrador</Text>
-       
+      <Button
+      style={styles.button}
+      title="Administrar categorias"
+      onPress={() => {navigation.navigate("admCategorias")}}
+      />  
+      <Button
+      style={styles.button}
+      title="Administrar productos"
+      onPress={() => {navigation.navigate("admProductos")}}
+      />  
+      <Button
+      style={styles.button}
+      title="Administrar mesas"
+      onPress={() => {navigation.navigate("admMesas")}}
+      />  
     </View>
   )
 }
