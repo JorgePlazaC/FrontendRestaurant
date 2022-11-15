@@ -8,7 +8,7 @@ export default function AdmMesas() {
   const navigation = useNavigation()
   return (
     <View style = {styles.viewBody}>
-      <Text>Administrador</Text>
+      <Text>Administrador de mesas</Text>
        
     </View>
   )
