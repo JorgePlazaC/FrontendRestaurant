@@ -148,8 +148,6 @@ const AgregarAlCarro = (producto) =>{
   console.log(arrayCarro)
 }
 
-//FALTA ELIMINAR EL PRODUCTO EN CASO QUE SEA LA ULTIMA UNIDAD
-
 const EliminarDelCarro = (producto) =>{
   //Vaciado de datos
   carro.forEach(elementCarro => {
@@ -204,7 +202,7 @@ const ContProductos = (producto,accion) => {
     arrayTemp.forEach((categoria) =>{
       categoria.data.forEach((productoCategoria)=>{
         if(producto.id === productoCategoria.id){
-          productoCategoria.stock++
+          productoCategoria.cant++
         }
       })
     })
@@ -212,7 +210,7 @@ const ContProductos = (producto,accion) => {
     arrayTemp.forEach((categoria) =>{
       categoria.data.forEach((productoCategoria)=>{
         if(producto.id === productoCategoria.id){
-          productoCategoria.stock--
+          productoCategoria.cant--
         }
       })
     })
@@ -229,7 +227,7 @@ const Item = ({ title }) => (
       title="-"
       onPress={() => {EliminarDelCarro(title)}}
       /> 
-    <Text style = {styles.textCont}>{title.stock}</Text>
+    <Text style = {styles.textCont}>{title.cant}</Text>
     <Button
       style={styles.buttonAgregar}
       title="+"
