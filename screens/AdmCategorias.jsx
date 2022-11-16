@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, Dimensions, FlatList } from 'react-native'
+import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, {useState,useEffect,useContext} from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -21,6 +21,9 @@ export default function AdmCategorias() {
   const [arrayCategorias , setArrayCategorias] = useState([])
   const [cargando,setCargando] = useState(true)
   const [modalVisible,setModalVisible] = useState(false)
+  const [modalEdicionVisible,setEdicionModalVisible] = useState(false)
+  const [modalBorrarVisible,setBorrarModalVisible] = useState(false)
+  const [categoriaEdit,setCategoriaEdit] = useState()
 
   let inputCategoria = ""
 
@@ -54,9 +57,47 @@ const Confirmar = async () =>{
   }
 }
 
+const ModalEdicion = (categoria) =>{
+  setCategoriaEdit(categoria)
+  setEdicionModalVisible(true)
+}
+
+const ModalBorrar = (categoria) =>{
+  setCategoriaEdit(categoria)
+  setBorrarModalVisible(true)
+}
+
+const EditarCategoria = async () => {
+  let urlEdicion = `${url}/${categoriaEdit.id}`
+  console.log(urlEdicion)
+  try {
+    const response = await axios.put(urlEdicion, {nombre:inputCategoria})
+    console.log(response.data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const BorrarCategoria = async () => {
+  let urlBorrar = `${url}/${categoriaEdit.id}`
+  console.log(urlBorrar)
+  try {
+    const response = await axios.delete(urlBorrar)
+    console.log(response.data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const Item = ({ title }) => (
   <View style={styles.item}>
-      <Text>{title.nombre}</Text>
+      <Text style = {styles.text}>{title.nombre}</Text>
+      <TouchableOpacity style={styles.button} onPress={()=>{ModalEdicion(title)}}>
+          <Image style = {styles.image} source={require("../src/images/editar.png")}/>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={()=>{ModalBorrar(title)}}>
+          <Image style = {styles.image} source={require("../src/images/borrar.png")}/>
+        </TouchableOpacity>
   </View>
 )
 
@@ -66,7 +107,6 @@ const renderItem = ({ item }) => (
 
   return (
     <View style = {styles.viewBody}>
-      <Text>Administrador de categorias</Text>
       <FlatList
         style = {styles.flatList}
         data={arrayCategorias}
@@ -87,6 +127,46 @@ const renderItem = ({ item }) => (
             style={styles.button}
             title="Confirmar"
             onPress={() => {Confirmar().then(fetchCategorias).finally(setModalVisible(false))}}
+            />
+            <Button
+            style={styles.button}
+            title="Cancelar"
+            onPress={() => {setModalVisible(false)}}
+            />
+          </View>
+        </View>
+      </Modal>
+      <Modal visible = {modalEdicionVisible} animationType = {'slide'}>
+        <View style = {styles.modalBackGround}>
+          <View style = {styles.modalContainer}>
+            <Text>Cambiar nombre</Text>
+            <TextInput placeholder='Nuevo nombre' onChangeText={(text) => inputCategoria = text}/>
+            <Button
+            style={styles.button}
+            title="Cambiar"
+            onPress={() => {EditarCategoria().then(fetchCategorias).finally(setEdicionModalVisible(false))}}
+            />
+            <Button
+            style={styles.button}
+            title="Cancelar"
+            onPress={() => {setEdicionModalVisible(false)}}
+            />
+          </View>
+        </View>
+      </Modal>
+      <Modal visible = {modalBorrarVisible} animationType = {'slide'}>
+        <View style = {styles.modalBackGround}>
+          <View style = {styles.modalContainer}>
+            <Text>¿Está seguro que desea eliminar la categoria?</Text>
+            <Button
+            style={styles.button}
+            title="Sí"
+            onPress={() => {BorrarCategoria().then(fetchCategorias).finally(setBorrarModalVisible(false))}}
+            />
+            <Button
+            style={styles.button}
+            title="Cancelar"
+            onPress={() => {setBorrarModalVisible(false)}}
             />
           </View>
         </View>
@@ -109,5 +189,29 @@ const styles = StyleSheet.create({
           width:'80%',
           backgroundColor:'white'
           
+          },
+          text:{
+            flex:0.6
+          },
+          button: {
+            backgroundColor: '#859a9b',
+            borderRadius: 10,
+            padding: 5,
+            marginBottom: 10,
+            shadowColor: '#303838',
+            shadowOffset: { width: 0, height: 5 },
+            shadowRadius: 10,
+            shadowOpacity: 0.35,
+            maxHeight:30,
+            maxWidth:30,
+            flex:0.2,
+            alignSelf: 'flex-end',
+            right: 0,
+            flexDirection: 'row-reverse',
+          },
+          image: {
+            maxHeight:20,
+            maxWidth:20,
+            marginBottom: 20,
           }
 })
