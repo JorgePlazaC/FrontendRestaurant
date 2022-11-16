@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableO
 import React, {useState,useEffect,useContext} from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
+import DropDownPicker from 'react-native-dropdown-picker'
 
 import RestaurantContext from '../src/components/RestaurantContext'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -16,7 +17,7 @@ export default function AdmProductos() {
 
   const baseUrl = 'http://10.0.2.2:8000'
   const url = `${baseUrl}/api/productos`
-  const urlCategorias = `${baseUrl}/api/productos`
+  const urlCategorias = `${baseUrl}/api/categorias`
   const {mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado} = useContext(RestaurantContext)
 
   const [arrayProductos , setArrayProductos] = useState([])
@@ -26,6 +27,8 @@ export default function AdmProductos() {
   const [modalEdicionVisible,setEdicionModalVisible] = useState(false)
   const [modalBorrarVisible,setBorrarModalVisible] = useState(false)
   const [productosEdit,setProductosEdit] = useState()
+  const [abrirDrop, setAbrirDrop] = useState(false);
+  const [valorDrop, setValorDrop] = useState(null);
 
   let inputProducto = ""
 
@@ -55,6 +58,7 @@ const fetchCategorias = async () => {
   try{
     const response = await axios.get(urlCategorias)
     setArrayCategorias(response.data)
+    console.log(response.data)
   }catch(error){
     
     console.log(error)
@@ -138,6 +142,19 @@ const renderItem = ({ item }) => (
           <View style = {styles.modalContainer}>
             <Text>Ingrese el nombre</Text>
             <TextInput placeholder='Nombre' onChangeText={(text) => inputProducto = text}/>
+            <Text>Elija una categoria</Text>
+            <DropDownPicker
+            schema={{
+              label: 'nombre',
+              value: 'id'
+            }}
+              open={abrirDrop}
+              value={valorDrop}
+              items={arrayCategorias}
+              setOpen={setAbrirDrop}
+              setValue={setValorDrop}
+              setItems={setArrayCategorias}
+            />
             <Text>Ingrese la descripción</Text>
             <TextInput placeholder='Descripción' onChangeText={(text) => inputProducto = text}/>
             <Text>Ingrese el precio</Text>
