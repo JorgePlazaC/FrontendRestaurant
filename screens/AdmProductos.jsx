@@ -3,6 +3,7 @@ import React, {useState,useEffect,useContext} from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import DropDownPicker from 'react-native-dropdown-picker'
+import * as ImagePicker from 'expo-image-picker';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -29,13 +30,21 @@ export default function AdmProductos() {
   const [productosEdit,setProductosEdit] = useState()
   const [abrirDrop, setAbrirDrop] = useState(false);
   const [valorDrop, setValorDrop] = useState(null);
+  const [image, setImage] = useState(null);
+  const [hasGalleryPermission,setHasGalleryPermission] = useState()
+  const [inputNombre,setInputNombre] = useState()
+  const [inputDescripcion,setInputDescripcion] = useState()
+  const [inputPrecio,setInputPrecio] = useState()
+  const [inputStock,setInputStock] = useState()
 
-  let inputProducto = ""
+  let cantFetch = 0
 
   useEffect(() => {
     (async () =>{
       await fetchProductos()
       await fetchCategorias()
+      const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      setHasGalleryPermission(galleryStatus === 'granted')
     })()
 }, [])
 
@@ -46,7 +55,6 @@ try{
   const response = await axios.get(url)
   setArrayProductos(response.data)
   setCargando(false)
-  console.log(arrayProductos)
 }catch(error){
   
   console.log(error)
@@ -58,7 +66,6 @@ const fetchCategorias = async () => {
   try{
     const response = await axios.get(urlCategorias)
     setArrayCategorias(response.data)
-    console.log(response.data)
   }catch(error){
     
     console.log(error)
@@ -67,8 +74,17 @@ const fetchCategorias = async () => {
   }
 
 const Confirmar = async () =>{
+  const data = new FormData();
+
+    data.append('nombre', {inputNombre})
+    data.append('idCategoria', {valorDrop})
+    data.append('imagen', {image})
+    data.append('descripcion', {inputDescripcion})
+    data.append('precio', {inputPrecio})
+    data.append('stock', {inputStock})
+    data.append('cant', {cantFetch})
   try {
-    const response = await axios.post(url, {nombre:inputProducto})
+    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,imagen:image,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
     console.log(response.data)
   } catch (error) {
     console.log(error)
@@ -87,7 +103,6 @@ const ModalBorrar = (producto) =>{
 
 const EditarCategoria = async () => {
   let urlEdicion = `${url}/${productosEdit.id}`
-  console.log(urlEdicion)
   try {
     const response = await axios.put(urlEdicion, {nombre:inputProducto})
     console.log(response.data)
@@ -98,7 +113,6 @@ const EditarCategoria = async () => {
 
 const BorrarCategoria = async () => {
   let urlBorrar = `${url}/${productosEdit.id}`
-  console.log(urlBorrar)
   try {
     const response = await axios.delete(urlBorrar)
     console.log(response.data)
@@ -106,6 +120,20 @@ const BorrarCategoria = async () => {
     console.log(error)
   }
 }
+
+const pickImage = async () => {
+  // No permissions request is necessary for launching the image library
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 1,
+  });
+
+  if (!result.canceled) {
+    setImage(result.uri);
+  }
+};
 
 const Item = ({ title }) => (
   <View style={styles.item}>
@@ -122,6 +150,16 @@ const Item = ({ title }) => (
 const renderItem = ({ item }) => (
   <Item title={item} />
 )
+
+const Despliegue = () =>{
+  console.log(inputNombre)
+  console.log(valorDrop)
+  console.log(inputDescripcion)
+  console.log(inputPrecio)
+  console.log(inputStock)
+  console.log(cantFetch)
+  console.log(image)
+}
 
   return (
     <View style = {styles.viewBody}>
@@ -141,7 +179,7 @@ const renderItem = ({ item }) => (
         <View style = {styles.modalBackGround}>
           <View style = {styles.modalContainer}>
             <Text>Ingrese el nombre</Text>
-            <TextInput placeholder='Nombre' onChangeText={(text) => inputProducto = text}/>
+            <TextInput placeholder='Nombre' onChangeText={(text) => setInputNombre(text)}/>
             <Text>Elija una categoria</Text>
             <DropDownPicker
             schema={{
@@ -156,11 +194,13 @@ const renderItem = ({ item }) => (
               setItems={setArrayCategorias}
             />
             <Text>Ingrese la descripción</Text>
-            <TextInput placeholder='Descripción' onChangeText={(text) => inputProducto = text}/>
+            <TextInput placeholder='Descripción' onChangeText={(text) => setInputDescripcion(text)}/>
             <Text>Ingrese el precio</Text>
-            <TextInput placeholder='Precio' onChangeText={(text) => inputProducto = text}/>
+            <TextInput placeholder='Precio' onChangeText={(text) => setInputPrecio(text)}/>
             <Text>Ingrese el stock</Text>
-            <TextInput placeholder='Stock' onChangeText={(text) => inputProducto = text}/>
+            <TextInput placeholder='Stock' onChangeText={(text) => setInputStock(text)}/>
+            <Button title="Pick an image from camera roll" onPress={pickImage} />
+            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
             <Button
             style={styles.button}
             title="Confirmar"
@@ -171,6 +211,11 @@ const renderItem = ({ item }) => (
             title="Cancelar"
             onPress={() => {setModalVisible(false)}}
             />
+            <Button
+            style={styles.button}
+            title="Console"
+            onPress={() => {console.log(Despliegue())}}
+            />
           </View>
         </View>
       </Modal>
@@ -178,7 +223,7 @@ const renderItem = ({ item }) => (
         <View style = {styles.modalBackGround}>
           <View style = {styles.modalContainer}>
             <Text>Cambiar nombre</Text>
-            <TextInput placeholder='Nuevo nombre' onChangeText={(text) => inputProducto = text}/>
+            <TextInput placeholder='Nuevo nombre' onChangeText={(text) => inputNombre = text}/>
             <Button
             style={styles.button}
             title="Cambiar"
@@ -225,8 +270,7 @@ const styles = StyleSheet.create({
             marginHorizontal: 30,
           borderRadius: 16,
           width:'80%',
-          backgroundColor:'white'
-          
+          backgroundColor:'white',
           },
           text:{
             flex:0.6
@@ -251,5 +295,8 @@ const styles = StyleSheet.create({
             maxHeight:20,
             maxWidth:20,
             marginBottom: 20,
+          },
+          flatList: {
+            maxHeight: width.height-150,
           }
 })
