@@ -39,6 +39,7 @@ export default function AdmProductos() {
 
   let cantFetch = 0
 
+
   useEffect(() => {
     (async () =>{
       await fetchProductos()
@@ -128,6 +129,7 @@ const pickImage = async () => {
     allowsEditing: true,
     aspect: [4, 3],
     quality: 1,
+    base64:true
   });
 
   if (!result.canceled) {
@@ -138,6 +140,7 @@ const pickImage = async () => {
 const Item = ({ title }) => (
   <View style={styles.item}>
       <Text style = {styles.text}>{title.nombre}</Text>
+      
       <TouchableOpacity style={styles.button} onPress={()=>{ModalEdicion(title)}}>
           <Image style = {styles.image} source={require("../src/images/editar.png")}/>
         </TouchableOpacity>
@@ -175,6 +178,11 @@ const Despliegue = () =>{
       title="Agregar producto"
       onPress={() => {console.log(setModalVisible(true))}}
       />
+      <Button
+            style={styles.button}
+            title="Cancelar"
+            onPress={() => {console.log(image)}}
+            />
       <Modal visible = {modalVisible} animationType = {'slide'}>
         <View style = {styles.modalBackGround}>
           <View style = {styles.modalContainer}>
@@ -210,11 +218,6 @@ const Despliegue = () =>{
             style={styles.button}
             title="Cancelar"
             onPress={() => {setModalVisible(false)}}
-            />
-            <Button
-            style={styles.button}
-            title="Console"
-            onPress={() => {console.log(Despliegue())}}
             />
           </View>
         </View>
