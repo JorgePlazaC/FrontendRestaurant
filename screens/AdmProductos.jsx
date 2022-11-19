@@ -37,13 +37,15 @@ export default function AdmProductos() {
   const [inputPrecio,setInputPrecio] = useState()
   const [inputStock,setInputStock] = useState()
 
+  const [image64,setImage64] = useState()
+
   let cantFetch = 0
 
 
   useEffect(() => {
     (async () =>{
       await fetchProductos()
-      await fetchCategorias()
+      await fetchCategorias().finally(TiempoExtra)
       const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync()
       setHasGalleryPermission(galleryStatus === 'granted')
     })()
@@ -55,7 +57,6 @@ const fetchProductos = async () => {
 try{
   const response = await axios.get(url)
   setArrayProductos(response.data)
-  setCargando(false)
 }catch(error){
   
   console.log(error)
@@ -75,18 +76,22 @@ const fetchCategorias = async () => {
   }
 
 const Confirmar = async () =>{
+  /*
   const data = new FormData();
 
     data.append('nombre', {inputNombre})
     data.append('idCategoria', {valorDrop})
-    data.append('imagen', {image})
+    data.append('imagen', {image64})
     data.append('descripcion', {inputDescripcion})
     data.append('precio', {inputPrecio})
     data.append('stock', {inputStock})
     data.append('cant', {cantFetch})
+    */
   try {
-    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,imagen:image,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
+    
+    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,imagen:image64,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
     console.log(response.data)
+    
   } catch (error) {
     console.log(error)
   }
@@ -134,8 +139,17 @@ const pickImage = async () => {
 
   if (!result.canceled) {
     setImage(result.uri);
+    setImage64(result.base64)
   }
 };
+
+const TiempoExtra = () => {
+  setCargando(true)
+  setTimeout(() => {
+    setCargando(false)
+    setModalVisible(false)
+  }, 2000)
+}
 
 const Item = ({ title }) => (
   <View style={styles.item}>
@@ -147,6 +161,9 @@ const Item = ({ title }) => (
         <TouchableOpacity style={styles.button} onPress={()=>{ModalBorrar(title)}}>
           <Image style = {styles.image} source={require("../src/images/borrar.png")}/>
         </TouchableOpacity>
+        {title.imagen && (<Image source={{ uri: 'data:image/jpg;base64,' +  title.imagen}}
+            style={{ width: 200, height: 200 }}
+          />)}
   </View>
 )
 
@@ -165,7 +182,8 @@ const Despliegue = () =>{
 }
 
   return (
-    <View style = {styles.viewBody}>
+    <View>
+    {cargando == true ? (<Text>Cargando</Text>):(<View style = {styles.viewBody}>
       <FlatList
         style = {styles.flatList}
         data={arrayProductos
@@ -181,7 +199,7 @@ const Despliegue = () =>{
       <Button
             style={styles.button}
             title="Cancelar"
-            onPress={() => {console.log(image)}}
+            onPress={() => {console.log(arrayProductos[9].imagen)}}
             />
       <Modal visible = {modalVisible} animationType = {'slide'}>
         <View style = {styles.modalBackGround}>
@@ -212,7 +230,7 @@ const Despliegue = () =>{
             <Button
             style={styles.button}
             title="Confirmar"
-            onPress={() => {Confirmar().then(fetchProductos).finally(setModalVisible(false))}}
+            onPress={() => {Confirmar().then(fetchProductos).finally(TiempoExtra)}}
             />
             <Button
             style={styles.button}
@@ -257,6 +275,7 @@ const Despliegue = () =>{
           </View>
         </View>
       </Modal>
+    </View>)}
     </View>
   )
 }
