@@ -39,10 +39,11 @@ export default function AdmProductos() {
   const [inputPrecio,setInputPrecio] = useState()
   const [inputStock,setInputStock] = useState()
   const [cargandoImagen,setCargandoImagen] = useState(true)
-  const [imagenes,setImagenes] = useState()
+  const [imagenes,setImagenes] = useState([])
   const [idImagen,setIdImagen] = useState()
-
+  const [urlImagenActual,setUrlImagenActual] = useState()
   const [image64,setImage64] = useState()
+  const [subiendoImagen,setSubiendoImagen] = useState(false)
 
   let cantFetch = 0
 
@@ -186,7 +187,16 @@ const Confirmar = async () =>{
   console.log(inputStock)
   console.log(cantFetch)
       console.log(idImagen)
-      const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,idImagen:idImagen,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
+      /*
+      let idBuscada = imagenes.length
+      if(idBuscada == 0){
+        idBuscada = 1
+      } else{
+        idBuscada = idBuscada+1
+      }
+      */
+      
+      const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,idImagen:idImagen,urlImagen:urlImagenActual,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
       
     }, 1000)
     
@@ -261,15 +271,18 @@ const uploadImage = async () => {
     type,
   });
   try {
+    setSubiendoImagen(true)
     //console.log(formData)
     const { data } = await axios.post(`${baseUrl}/api/upload`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     id = await data.data.id
     //console.log(data.data)
-    setIdImagen(id)
-    
-    
+    setIdImagen(await data.data.id)
+    setUrlImagenActual(await data.data.url)
+    setSubiendoImagen(false)
+    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,idImagen:await data.data.id,urlImagen:await data.data.url,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
+      
     
     if (!data.isSuccess) {
       console.log(data)
@@ -298,8 +311,7 @@ const TiempoExtra = () => {
 
 const Metodos = async() =>{
   await uploadImage()
-  await Confirmar()
-    
+  //await Confirmar()   
 }
 
 const Item = ({ title }) => (
@@ -312,7 +324,7 @@ const Item = ({ title }) => (
         <TouchableOpacity style={styles.button} onPress={()=>{ModalBorrar(title)}}>
           <Image style = {styles.image} source={require("../src/images/borrar.png")}/>
         </TouchableOpacity>
-        {cargandoImagen == false && imagenes ? (<Image source={{ uri: 'data:image/jpg;base64,' +  imagenes[0].imagen }}
+        {cargandoImagen == false && imagenes ? (<Image source={{ uri: title.urlImagen }}
             style={{ width: 200, height: 200, backgroundColor: '#859a9b'}}
           />):(<View><Text>Cargando imagen</Text></View>)}
   </View>
@@ -399,7 +411,7 @@ const Despliegue = () =>{
             <Button
             style={styles.button}
             title="Cambiar"
-            onPress={() => {EditarCategoria().then(fetchProductos).finally(setEdicionModalVisible(false))}}
+            onPress={() => {EditarCategoria()}}
             />
             <Button
             style={styles.button}
