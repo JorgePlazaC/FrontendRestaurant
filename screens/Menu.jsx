@@ -45,7 +45,7 @@ export default function Menu({navigation}) {
     try{
       const response = await axios.get(urlCategorias)
 
-      arrayCategorias = response.data
+      arrayCategorias = await response.data
       
       arrayCategorias.forEach((categoriaNueva,index) => {
         let nombre = categoriaNueva.nombre
@@ -58,21 +58,20 @@ export default function Menu({navigation}) {
         
       });
       
-      arrayId.forEach(async id => {
+      arrayId.forEach(async (id,index) => {
         
         let nuevaUrl = urlProductos+"?idCategoria="+id
         const responseProductos = await axios.get(nuevaUrl)
+        let cont = index
         
-        let cont = id-1
-        
-        array[cont].data =responseProductos.data
+        array[cont].data =await responseProductos.data
 
       })
       setArrayProductos(array)
       const responseTodosPr = await axios.get(urlTodosProductos)
 
-      arrayTodosProductos = responseTodosPr.data
-      setProductos(arrayTodosProductos)
+      arrayTodosProductos = await responseTodosPr.data
+      setProductos(await arrayTodosProductos)
 
       //setCargando(false)
       console.log(arrayProductos)

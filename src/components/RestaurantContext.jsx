@@ -6,9 +6,10 @@ export function RestaurantProvider({children}){
     const [mesa,setMesa] = useState()
     const [carro,setCarro] = useState([])
     const [carroAgregado,setCarroAgregado] = useState(false)
+    const [imagenes,setImagenes] = useState()
 
     return(
-        <RestaurantContext.Provider value={{mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado}}>{children}</RestaurantContext.Provider>
+        <RestaurantContext.Provider value={{mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes}}>{children}</RestaurantContext.Provider>
     )
 }
 

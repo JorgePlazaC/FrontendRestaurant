@@ -9,6 +9,7 @@ import RestaurantContext from '../src/components/RestaurantContext'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 import { TextInput } from 'react-native'
+import { color, JumpingTransition } from 'react-native-reanimated'
 
 const width = Dimensions.get('window')
 
@@ -19,6 +20,7 @@ export default function AdmProductos() {
   const baseUrl = 'http://10.0.2.2:8000'
   const url = `${baseUrl}/api/productos`
   const urlCategorias = `${baseUrl}/api/categorias`
+  const urlImagen = `${baseUrl}/api/imagens`
   const {mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado} = useContext(RestaurantContext)
 
   const [arrayProductos , setArrayProductos] = useState([])
@@ -36,6 +38,8 @@ export default function AdmProductos() {
   const [inputDescripcion,setInputDescripcion] = useState()
   const [inputPrecio,setInputPrecio] = useState()
   const [inputStock,setInputStock] = useState()
+  const [cargandoImagen,setCargandoImagen] = useState(true)
+  const [imagenes,setImagenes] = useState()
 
   const [image64,setImage64] = useState()
 
@@ -44,19 +48,70 @@ export default function AdmProductos() {
 
   useEffect(() => {
     (async () =>{
-      await fetchProductos()
-      await fetchCategorias().finally(TiempoExtra)
+      
+      //await fetchProductosNormal()
+      //await fetchImagenesNormal()
+      await fetchAllAxios()
+
+      //await fetchImagen().finally(setCargandoImagen(false))
+      //await fetchProductos().finally(setCargando(false))
+      //await fetchCategorias().finally(setCargando(false))
+      
       const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync()
       setHasGalleryPermission(galleryStatus === 'granted')
     })()
 }, [])
+
+const fetchProductosNormal = async () =>{
+    try {
+      let response = await fetch(
+        url
+      );
+      let json = await response.json();
+      setArrayProductos(json)
+      
+    } catch (error) {
+       console.error(error);
+    }
+}
+
+const fetchImagenesNormal = async () =>{
+  try {
+    let response = await fetch(
+      urlImagen
+    );
+    let json = await response.json();
+    console.log(json)
+    setImagenes(json)
+  } catch (error) {
+     console.error(error);
+  }
+}
+
+//Fetch usado ahora
+
+const fetchAllAxios = async () =>{
+  let api = [
+    urlImagen,
+    url,
+    urlCategorias,
+  ];
+
+   await Promise.all(api.map(async (api) => await axios.get(api))).then(async([{data: imagenes}, {data: productos}, {data: categorias}] )=> {
+    setImagenes(await imagenes)
+    setArrayProductos(await productos)
+    setArrayCategorias(await categorias)
+  });
+  setCargando(false)
+  setCargandoImagen(false)
+}
 
 
 // Invoking get method to perform a GET request
 const fetchProductos = async () => {
 try{
   const response = await axios.get(url)
-  setArrayProductos(response.data)
+  setArrayProductos( await response.data)
 }catch(error){
   
   console.log(error)
@@ -67,12 +122,33 @@ try{
 const fetchCategorias = async () => {
   try{
     const response = await axios.get(urlCategorias)
-    setArrayCategorias(response.data)
+    setArrayCategorias( await response.data)
   }catch(error){
     
     console.log(error)
     console.log({url})
   }
+  }
+
+  const fetchImagen = async () => {
+    let nuevaUrl = urlImagen
+    try{
+      const response = await axios.get(nuevaUrl)
+      setImagenes( await response.data)
+    }catch(error){
+      
+      console.log(error)
+      console.log({url})
+    }
+    }
+
+  const BuscarImagen = (id) =>{
+    imagenes.forEach((element,index) =>{
+      if(element.id === id){
+        //console.log(index)
+        return index
+      }
+    })
   }
 
 const Confirmar = async () =>{
@@ -88,8 +164,12 @@ const Confirmar = async () =>{
     data.append('cant', {cantFetch})
     */
   try {
+
+    const responseImagen = await axios.post(urlImagen, {tipo:"jpg",imagen:image64})
+    const id = await responseImagen.data.id
+    console.log(responseImagen.data.id)
     
-    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,imagen:image64,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
+    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,idImagen:id,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
     console.log(response.data)
     
   } catch (error) {
@@ -147,9 +227,12 @@ const TiempoExtra = () => {
   setCargando(true)
   setTimeout(() => {
     setCargando(false)
+    setCargandoImagen(false)
     setModalVisible(false)
-  }, 2000)
+    //console.log(imagenes)
+  }, 1)
 }
+
 
 const Item = ({ title }) => (
   <View style={styles.item}>
@@ -161,9 +244,9 @@ const Item = ({ title }) => (
         <TouchableOpacity style={styles.button} onPress={()=>{ModalBorrar(title)}}>
           <Image style = {styles.image} source={require("../src/images/borrar.png")}/>
         </TouchableOpacity>
-        {title.imagen && (<Image source={{ uri: 'data:image/jpg;base64,' +  title.imagen}}
-            style={{ width: 200, height: 200 }}
-          />)}
+        {cargandoImagen == false && imagenes ? (<Image source={{ uri: 'data:image/jpg;base64,' +  imagenes[0].imagen }}
+            style={{ width: 200, height: 200, backgroundColor: '#859a9b'}}
+          />):(<View><Text>Cargando imagen</Text></View>)}
   </View>
 )
 
@@ -178,7 +261,7 @@ const Despliegue = () =>{
   console.log(inputPrecio)
   console.log(inputStock)
   console.log(cantFetch)
-  console.log(image)
+  //console.log(image)
 }
 
   return (
@@ -198,8 +281,8 @@ const Despliegue = () =>{
       />
       <Button
             style={styles.button}
-            title="Cancelar"
-            onPress={() => {console.log(arrayProductos[9].imagen)}}
+            title="Despliegue consola"
+            onPress={() => {Despliegue()}}
             />
       <Modal visible = {modalVisible} animationType = {'slide'}>
         <View style = {styles.modalBackGround}>
