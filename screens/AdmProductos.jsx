@@ -178,7 +178,18 @@ const Confirmar = async () =>{
     //const id = await responseImagen.data.id
     //console.log(responseImagen.data.id)
     //console.log(idImagen)
-    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,idImagen:idImagen,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
+    setTimeout(async() => {
+      console.log(inputNombre)
+  console.log(valorDrop)
+  console.log(inputDescripcion)
+  console.log(inputPrecio)
+  console.log(inputStock)
+  console.log(cantFetch)
+      console.log(idImagen)
+      const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,idImagen:idImagen,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
+      
+    }, 1000)
+    
     //console.log(response.data)
     
   } catch (error) {
@@ -254,8 +265,8 @@ const uploadImage = async () => {
     const { data } = await axios.post(`${baseUrl}/api/upload`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    id = await data.id
-    //console.log(id)
+    id = await data.data.id
+    //console.log(data.data)
     setIdImagen(id)
     
     
@@ -288,6 +299,7 @@ const TiempoExtra = () => {
 const Metodos = async() =>{
   await uploadImage()
   await Confirmar()
+    
 }
 
 const Item = ({ title }) => (
