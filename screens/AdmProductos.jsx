@@ -40,6 +40,7 @@ export default function AdmProductos() {
   const [inputStock,setInputStock] = useState()
   const [cargandoImagen,setCargandoImagen] = useState(true)
   const [imagenes,setImagenes] = useState()
+  const [idImagen,setIdImagen] = useState()
 
   const [image64,setImage64] = useState()
 
@@ -173,12 +174,12 @@ const Confirmar = async () =>{
     */
   try {
 
-    const responseImagen = await axios.post(urlImagen, {tipo:"jpg",imagen:image64})
-    const id = await responseImagen.data.id
-    console.log(responseImagen.data.id)
-    
-    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,idImagen:id,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
-    console.log(response.data)
+    //const responseImagen = await axios.post(urlImagen, {tipo:"jpg",imagen:image64})
+    //const id = await responseImagen.data.id
+    //console.log(responseImagen.data.id)
+    //console.log(idImagen)
+    const response = await axios.post(url, {nombre:inputNombre,idCategoria:valorDrop,idImagen:idImagen,descripcion:inputDescripcion,precio:inputPrecio,stock:inputStock,cant:cantFetch})
+    //console.log(response.data)
     
   } catch (error) {
     console.log(error)
@@ -218,16 +219,59 @@ const BorrarCategoria = async () => {
 const pickImage = async () => {
   // No permissions request is necessary for launching the image library
   let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
     allowsEditing: true,
     aspect: [4, 3],
     quality: 1,
-    base64:true
   });
 
   if (!result.canceled) {
-    setImage(result.uri);
+    setImage(result);
     setImage64(result.base64)
+  }
+};
+
+const uploadImage = async () => {
+  let id
+  if (!image) return;
+  const uri =
+    Platform.OS === "android"
+      ? image.uri
+      : image.uri.replace("file://", "");
+  let filename = ""
+  filename = image.uri.split("/").pop();
+  const match = /\.(\w+)$/.exec(filename);
+  const ext = match?.[1];
+  const type = match ? `image/${match[1]}` : `image`;
+  const formData = new FormData();
+  formData.append("image", {
+    uri,
+    name: `image.${ext}`,
+    type,
+  });
+  try {
+    //console.log(formData)
+    const { data } = await axios.post(`${baseUrl}/api/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    id = await data.id
+    //console.log(id)
+    setIdImagen(id)
+    
+    
+    
+    if (!data.isSuccess) {
+      console.log(data)
+      alert("Image upload failed!");
+      return;
+    }
+    alert("Image Uploaded");
+  } catch (err) {
+    console.log(err);
+    alert("Something went wrong");
+  } finally {
+    setImage(undefined);
+    
   }
 };
 
@@ -241,6 +285,10 @@ const TiempoExtra = () => {
   }, 1000)
 }
 
+const Metodos = async() =>{
+  await uploadImage()
+  await Confirmar()
+}
 
 const Item = ({ title }) => (
   <View style={styles.item}>
@@ -317,11 +365,11 @@ const Despliegue = () =>{
             <Text>Ingrese el stock</Text>
             <TextInput placeholder='Stock' onChangeText={(text) => setInputStock(text)}/>
             <Button title="Pick an image from camera roll" onPress={pickImage} />
-            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+            {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200 }} />}
             <Button
             style={styles.button}
             title="Confirmar"
-            onPress={() => {Confirmar().then(fetchProductos).finally(TiempoExtra)}}
+            onPress={() => {Metodos()}}
             />
             <Button
             style={styles.button}
