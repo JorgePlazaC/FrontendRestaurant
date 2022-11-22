@@ -97,13 +97,21 @@ const fetchAllAxios = async () =>{
     urlCategorias,
   ];
 
-   await Promise.all(api.map(async (api) => await axios.get(api))).then(async([{data: imagenes}, {data: productos}, {data: categorias}] )=> {
-    setImagenes(await imagenes)
-    setArrayProductos(await productos)
-    setArrayCategorias(await categorias)
-  });
-  setCargando(false)
-  setCargandoImagen(false)
+  try{
+
+    await Promise.all(api.map(async (api) => await axios.get(api))).then(async([{data: imagenes}, {data: productos}, {data: categorias}] )=> {
+      console.log(await imagenes[0])
+      setImagenes(await imagenes)
+      setArrayProductos(await productos)
+      setArrayCategorias(await categorias)
+      
+    });
+    
+    setCargando(false)
+    setCargandoImagen(false)
+  } catch(error){
+    console.log(error)
+  }
 }
 
 
@@ -230,7 +238,7 @@ const TiempoExtra = () => {
     setCargandoImagen(false)
     setModalVisible(false)
     //console.log(imagenes)
-  }, 1)
+  }, 1000)
 }
 
 
