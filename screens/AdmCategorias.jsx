@@ -12,12 +12,17 @@ const width = Dimensions.get('window')
 
 export default function AdmCategorias() {
 
+  //Asignacion a contsante de UseNavigation
   const navigation = useNavigation()
 
+  //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
   const url = `${baseUrl}/api/categorias`
+
+  //Llamado a UseContext
   const {mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado} = useContext(RestaurantContext)
 
+  //UseState
   const [arrayCategorias , setArrayCategorias] = useState([])
   const [cargando,setCargando] = useState(true)
   const [modalVisible,setModalVisible] = useState(false)

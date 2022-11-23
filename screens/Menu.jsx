@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, SectionList, ActivityIndicator, Dimensions, ListItem,StatusBar } from 'react-native'
+import { StyleSheet, Text, View, Button, SectionList, ActivityIndicator, Dimensions,Image, ListItem,StatusBar } from 'react-native'
 import React, {useState,useEffect,useContext} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
@@ -220,6 +220,8 @@ const ContProductos = (producto,accion) => {
 
 const Item = ({ title }) => (
   <View style = {styles.container}>
+    <Image source={{ uri: title.urlImagen }}
+            style={{ width: 80, height: 80, backgroundColor: '#859a9b'}}/>
     <Text style={styles.textSection}>{title.nombre}</Text>
     <Button
       style={styles.buttonEliminar}
@@ -232,6 +234,7 @@ const Item = ({ title }) => (
       title="+"
       onPress={() => {AgregarAlCarro(title)}}
       /> 
+      
   </View>
 )
 
