@@ -7,10 +7,11 @@ import { useNavigation } from '@react-navigation/native'
 
 export default function Espera() {
 
+  //Asignacion a constante de UseNavigation
   const navigation = useNavigation()
   
+  //Volver al menú de compra
   const SeguirComprando = () =>{
-    //navigation.goBack()
     const popAction = StackActions.pop(2)
     navigation.dispatch(popAction)
   }
