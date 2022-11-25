@@ -107,16 +107,17 @@ export default function AdmProductos() {
 
       const response = await axios.post(url, { nombre: inputNombre, idCategoria: valorDrop, idImagen: await data.data.id, urlImagen: await data.data.url, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock, cant: cantFetch })
       setSubiendoImagen(false)
+      await fetchAllAxios()
 
       if (!data.isSuccess) {
         console.log(data)
-        alert("Image upload failed!");
+        alert("Problema al subir la imagen!");
         return;
       }
-      alert("Image Uploaded");
+      //alert("Image Uploaded");
     } catch (err) {
       console.log(err);
-      alert("Something went wrong");
+      alert("Algo salió mal");
     } finally {
       setImage(undefined);
 
@@ -128,6 +129,7 @@ export default function AdmProductos() {
     try {
       const response = await axios.put(urlEdicion, { nombre: inputNombre,idCategoria:valorDrop, descripcion: inputDescripcion,precio:inputPrecio,stock:inputStock })
       console.log(response.data)
+      await fetchAllAxios()
     } catch (error) {
       console.log(error)
     }
@@ -138,6 +140,7 @@ export default function AdmProductos() {
     try {
       const response = await axios.delete(urlBorrar)
       console.log(response.data)
+      await fetchAllAxios()
     } catch (error) {
       console.log(error)
     }
@@ -145,6 +148,14 @@ export default function AdmProductos() {
 
   const Metodos = async () => {
     await uploadImage()
+  }
+
+  const FormatearInputs = () =>{
+    setInputNombre("")
+    setValorDrop("")
+    setInputDescripcion("")
+    setInputPrecio("")
+    setInputStock("")
   }
 
   //Modals
@@ -183,8 +194,7 @@ export default function AdmProductos() {
       {cargando == true ? (<Text>Cargando</Text>) : (<View style={styles.viewBody}>
         <FlatList
           style={styles.flatList}
-          data={arrayProductos
-          }
+          data={arrayProductos}
           renderItem={renderItem}
           keyExtractor={item => item.id}
         />
@@ -223,7 +233,7 @@ export default function AdmProductos() {
               <Button
                 style={styles.button}
                 title="Confirmar"
-                onPress={() => { Metodos() }}
+                onPress={() => { Metodos().then(FormatearInputs()).finally(setModalVisible(false)) }}
               />
               <Button
                 style={styles.button}
@@ -261,7 +271,7 @@ export default function AdmProductos() {
               <Button
                 style={styles.button}
                 title="Actualizar"
-                onPress={() => { EditarProducto() }}
+                onPress={() => { EditarProducto().then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
               />
               <Button
                 style={styles.button}
@@ -280,7 +290,7 @@ export default function AdmProductos() {
               <Button
                 style={styles.button}
                 title="Sí"
-                onPress={() => { BorrarProducto().finally(setBorrarModalVisible(false)) }}
+                onPress={() => { BorrarProducto().then(fetchAllAxios()).then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
               />
               <Button
                 style={styles.button}

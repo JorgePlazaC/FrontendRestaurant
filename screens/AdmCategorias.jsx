@@ -81,6 +81,11 @@ export default function AdmCategorias() {
     }
   }
 
+  //Formatear inputs
+  const FormatearInputs = () =>{
+    inputCategoria = ""
+  }
+
   //Modals
   const ModalEdicion = (categoria) => {
     setCategoriaEdit(categoria)
@@ -129,12 +134,12 @@ export default function AdmCategorias() {
             <Button
               style={styles.button}
               title="Confirmar"
-              onPress={() => { Confirmar().then(fetchCategorias).finally(setModalVisible(false)) }}
+              onPress={() => { Confirmar().then(fetchCategorias).then(FormatearInputs()).finally(setModalVisible(false)) }}
             />
             <Button
               style={styles.button}
               title="Cancelar"
-              onPress={() => { setModalVisible(false) }}
+              onPress={() => { setModalVisible(false)}}
             />
           </View>
         </View>
@@ -147,7 +152,7 @@ export default function AdmCategorias() {
             <Button
               style={styles.button}
               title="Actualizar"
-              onPress={() => { EditarCategoria().then(fetchCategorias).finally(setEdicionModalVisible(false)) }}
+              onPress={() => { EditarCategoria().then(fetchCategorias).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
             />
             <Button
               style={styles.button}
@@ -164,7 +169,7 @@ export default function AdmCategorias() {
             <Button
               style={styles.button}
               title="Sí"
-              onPress={() => { BorrarCategoria().then(fetchCategorias).finally(setBorrarModalVisible(false)) }}
+              onPress={() => { BorrarCategoria().then(fetchCategorias).then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
             />
             <Button
               style={styles.button}

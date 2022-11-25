@@ -81,6 +81,11 @@ export default function AdmMesas() {
     }
   }
 
+  //Formatear inputs
+  const FormatearInputs = () =>{
+    inputMesas = ""
+  }
+
   //Modals
   const ModalEdicion = (mesa) => {
     setMesaEdit(mesa)
@@ -129,7 +134,7 @@ export default function AdmMesas() {
             <Button
               style={styles.button}
               title="Confirmar"
-              onPress={() => { Confirmar().then(fetchMesas).finally(setModalVisible(false)) }}
+              onPress={() => { Confirmar().then(fetchMesas).then(FormatearInputs()).finally(setModalVisible(false)) }}
             />
             <Button
               style={styles.button}
@@ -147,7 +152,7 @@ export default function AdmMesas() {
             <Button
               style={styles.button}
               title="Actualizar"
-              onPress={() => { EditarCategoria().then(fetchMesas).finally(setEdicionModalVisible(false)) }}
+              onPress={() => { EditarCategoria().then(fetchMesas).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
             />
             <Button
               style={styles.button}
@@ -164,12 +169,12 @@ export default function AdmMesas() {
             <Button
               style={styles.button}
               title="Sí"
-              onPress={() => { BorrarCategoria().then(fetchMesas).finally(setBorrarModalVisible(false)) }}
+              onPress={() => { BorrarCategoria().then(fetchMesas).then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
             />
             <Button
               style={styles.button}
               title="Cancelar"
-              onPress={() => { setBorrarModalVisible(false) }}
+              onPress={() => { setBorrarModalVisible(false)}}
             />
           </View>
         </View>
