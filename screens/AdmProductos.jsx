@@ -18,6 +18,7 @@ export default function AdmProductos() {
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
   const url = `${baseUrl}/api/productos`
+  const urlProdActivos = `${baseUrl}/api/productosActivos`
   const urlCategorias = `${baseUrl}/api/categorias`
   const urlImagen = `${baseUrl}/api/imagens`
 
@@ -52,7 +53,7 @@ export default function AdmProductos() {
   //Llamado GET a api
   const fetchAllAxios = async () => {
     let api = [
-      url,
+      urlProdActivos,
       urlCategorias,
     ];
     try {

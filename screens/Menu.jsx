@@ -11,7 +11,7 @@ export default function Menu({ navigation }) {
 
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
-  const urlCategorias = `${baseUrl}/api/categorias`
+  const urlCategorias = `${baseUrl}/api/categoriasActivos`
   const urlProductos = `${baseUrl}/api/buscarPorCategoria`
   const urlTodosProductos = `${baseUrl}/api/productos`
 

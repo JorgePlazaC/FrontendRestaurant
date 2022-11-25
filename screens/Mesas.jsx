@@ -15,7 +15,7 @@ export default function Mesas() {
 
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
-  const url = `${baseUrl}/api/mesas`
+  const url = `${baseUrl}/api/mesasActivos`
 
   //UseContext
   const { mesa, setMesa } = useContext(RestaurantContext)

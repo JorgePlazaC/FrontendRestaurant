@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
-import React, { useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -16,13 +16,19 @@ export default function AdmCategorias() {
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
   const url = `${baseUrl}/api/categorias`
+  const urlActivos = `${baseUrl}/api/categoriasActivos`
+  const urlInactivos = `${baseUrl}/api/categoriasInactivos`
 
   //UseState
   const [arrayCategorias, setArrayCategorias] = useState([])
+  const [arrayCategoriasActivas, setArrayCategoriasActivas] = useState([])
+  const [arrayCategoriasInactivas, setArrayCategoriasInactivas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalEdicionVisible, setEdicionModalVisible] = useState(false)
   const [modalBorrarVisible, setBorrarModalVisible] = useState(false)
+  const [modalInactivosVisible, setInactivosModalVisible] = useState(false)
+  const [modalHabilitarVisible, setHabilitarModalVisible] = useState(false)
   const [categoriaEdit, setCategoriaEdit] = useState()
 
   //Varibales inputs de pantalla
@@ -30,22 +36,27 @@ export default function AdmCategorias() {
 
   useEffect(() => {
     (async () => {
-      await fetchCategorias()
+      await fetchAllAxios()
     })()
   }, [])
 
 
   //Llamado GET a api
-  const fetchCategorias = async () => {
+  const fetchAllAxios = async () => {
+    let api = [
+      url,
+      urlActivos,
+      urlInactivos
+    ];
     try {
-      const response = await axios.get(url)
-      setArrayCategorias(response.data)
+      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: categorias }, { data: categoriasActivos }, { data: categoriasInactivos }]) => {
+        setArrayCategorias(await categorias)
+        setArrayCategoriasActivas(await categoriasActivos)
+        setArrayCategoriasInactivas(await categoriasInactivos)
+      });
       setCargando(false)
-      console.log(arrayCategorias)
     } catch (error) {
-
       console.log(error)
-      console.log({ url })
     }
   }
 
@@ -70,11 +81,22 @@ export default function AdmCategorias() {
     }
   }
 
-  const BorrarCategoria = async () => {
-    let urlBorrar = `${url}/${categoriaEdit.id}`
-    console.log(urlBorrar)
+  const InHabilitarCategoria = async () => {
+    let urlInhabilitar = `${url}/${categoriaEdit.id}`
+    console.log(urlInhabilitar)
     try {
-      const response = await axios.delete(urlBorrar)
+      const response = await axios.put(urlInhabilitar, {estado:0})
+      console.log(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const HabilitarCategoria = async () => {
+    let urlHabilitar = `${url}/${categoriaEdit.id}`
+    console.log(urlHabilitar)
+    try {
+      const response = await axios.put(urlHabilitar, {estado:1})
       console.log(response.data)
     } catch (error) {
       console.log(error)
@@ -82,7 +104,7 @@ export default function AdmCategorias() {
   }
 
   //Formatear inputs
-  const FormatearInputs = () =>{
+  const FormatearInputs = () => {
     inputCategoria = ""
   }
 
@@ -95,6 +117,11 @@ export default function AdmCategorias() {
   const ModalBorrar = (categoria) => {
     setCategoriaEdit(categoria)
     setBorrarModalVisible(true)
+  }
+
+  const ModalHabilitar = (categoria) => {
+    setCategoriaEdit(categoria)
+    setHabilitarModalVisible(true)
   }
 
   const Item = ({ title }) => (
@@ -113,11 +140,27 @@ export default function AdmCategorias() {
     <Item title={item} />
   )
 
+  const Item2 = ({ title }) => (
+    <View style={styles.item}>
+      <Text style={styles.text}>{title.nombre}</Text>
+      <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
+        <Image style={styles.image} source={require("../src/images/editar.png")} />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => { ModalHabilitar(title) }}>
+        <Image style={styles.image} source={require("../src/images/borrar.png")} />
+      </TouchableOpacity>
+    </View>
+  )
+
+  const renderItem2 = ({ item }) => (
+    <Item2 title={item} />
+  )
+
   return (
     <View style={styles.viewBody}>
       <FlatList
         style={styles.flatList}
-        data={arrayCategorias}
+        data={arrayCategoriasActivas}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
@@ -125,6 +168,11 @@ export default function AdmCategorias() {
         style={styles.button}
         title="Agregar categoria"
         onPress={() => { console.log(setModalVisible(true)) }}
+      />
+      <Button
+        style={styles.button}
+        title="Ver categorias inactivas"
+        onPress={() => { setInactivosModalVisible(true) }}
       />
       <Modal visible={modalVisible} animationType={'slide'}>
         <View style={styles.modalBackGround}>
@@ -134,12 +182,12 @@ export default function AdmCategorias() {
             <Button
               style={styles.button}
               title="Confirmar"
-              onPress={() => { Confirmar().then(fetchCategorias).then(FormatearInputs()).finally(setModalVisible(false)) }}
+              onPress={() => { Confirmar().then(fetchAllAxios()).then(FormatearInputs()).finally(setModalVisible(false)) }}
             />
             <Button
               style={styles.button}
               title="Cancelar"
-              onPress={() => { setModalVisible(false)}}
+              onPress={() => { setModalVisible(false) }}
             />
           </View>
         </View>
@@ -152,7 +200,7 @@ export default function AdmCategorias() {
             <Button
               style={styles.button}
               title="Actualizar"
-              onPress={() => { EditarCategoria().then(fetchCategorias).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
+              onPress={() => { EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
             />
             <Button
               style={styles.button}
@@ -165,16 +213,46 @@ export default function AdmCategorias() {
       <Modal visible={modalBorrarVisible} animationType={'slide'}>
         <View style={styles.modalBackGround}>
           <View style={styles.modalContainer}>
-            <Text>¿Está seguro que desea eliminar la categoria?</Text>
+            <Text>¿Está seguro que desea deshabilitar la categoria?</Text>
             <Button
               style={styles.button}
               title="Sí"
-              onPress={() => { BorrarCategoria().then(fetchCategorias).then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
+              onPress={() => { InHabilitarCategoria().then(fetchAllAxios).finally(setBorrarModalVisible(false)) }}
             />
             <Button
               style={styles.button}
               title="Cancelar"
               onPress={() => { setBorrarModalVisible(false) }}
+            />
+          </View>
+        </View>
+      </Modal>
+      <Modal visible={modalInactivosVisible} animationType={'slide'}>
+        <FlatList
+          style={styles.flatList}
+          data={arrayCategoriasInactivas}
+          renderItem={renderItem2}
+          keyExtractor={item => item.id}
+        />
+        <Button
+          style={styles.button}
+          title="Volver"
+          onPress={() => { setInactivosModalVisible(false) }}
+        />
+      </Modal>
+      <Modal visible={modalHabilitarVisible} animationType={'slide'}>
+        <View style={styles.modalBackGround}>
+          <View style={styles.modalContainer}>
+            <Text>¿Está seguro que desea habilitar la categoria?</Text>
+            <Button
+              style={styles.button}
+              title="Sí"
+              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
+            />
+            <Button
+              style={styles.button}
+              title="Cancelar"
+              onPress={() => { setHabilitarModalVisible(false) }}
             />
           </View>
         </View>
