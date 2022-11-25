@@ -146,7 +146,7 @@ export default function AdmCategorias() {
             <TextInput placeholder='Nuevo nombre' onChangeText={(text) => inputCategoria = text} />
             <Button
               style={styles.button}
-              title="Cambiar"
+              title="Actualizar"
               onPress={() => { EditarCategoria().then(fetchCategorias).finally(setEdicionModalVisible(false)) }}
             />
             <Button

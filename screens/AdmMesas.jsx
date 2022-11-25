@@ -146,7 +146,7 @@ export default function AdmMesas() {
             <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
             <Button
               style={styles.button}
-              title="Cambiar"
+              title="Actualizar"
               onPress={() => { EditarCategoria().then(fetchMesas).finally(setEdicionModalVisible(false)) }}
             />
             <Button

@@ -55,9 +55,15 @@ export default function Menu({ navigation }) {
     let arrayCategorias = []
     let arrayTodosProductos = []
     try {
-      const response = await axios.get(urlCategorias)
+      await axios.get(urlCategorias).then(function (response) {
+        console.log(response.data);
+        arrayCategorias = response.data
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
-      arrayCategorias = await response.data
+      
 
       arrayCategorias.forEach((categoriaNueva, index) => {
         let nombre = categoriaNueva.nombre
@@ -73,17 +79,27 @@ export default function Menu({ navigation }) {
       arrayId.forEach(async (id, index) => {
 
         let nuevaUrl = urlProductos + "?idCategoria=" + id
-        const responseProductos = await axios.get(nuevaUrl)
-        let cont = index
+        await axios.get(nuevaUrl).then(function (response) {
+          console.log(response);
+          let cont = index
 
-        array[cont].data = await responseProductos.data
-
+        array[cont].data = response.data
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
       })
       setArrayProductos(array)
-      const responseTodosPr = await axios.get(urlTodosProductos)
+      await axios.get(urlTodosProductos).then(function (response) {
+        console.log(response);
+        arrayTodosProductos = response.data
+      setProductos(arrayTodosProductos)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
-      arrayTodosProductos = await responseTodosPr.data
-      setProductos(await arrayTodosProductos)
+      
 
       //setCargando(false)
       console.log(arrayProductos)

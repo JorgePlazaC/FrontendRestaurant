@@ -126,7 +126,7 @@ export default function AdmProductos() {
   const EditarProducto = async () => {
     let urlEdicion = `${url}/${productosEdit.id}`
     try {
-      const response = await axios.put(urlEdicion, { nombre: inputProducto })
+      const response = await axios.put(urlEdicion, { nombre: inputNombre,idCategoria:valorDrop, descripcion: inputDescripcion,precio:inputPrecio,stock:inputStock })
       console.log(response.data)
     } catch (error) {
       console.log(error)
@@ -204,6 +204,7 @@ export default function AdmProductos() {
                   label: 'nombre',
                   value: 'id'
                 }}
+                placeholder="Seleccione una categoria"
                 open={abrirDrop}
                 value={valorDrop}
                 items={arrayCategorias}
@@ -217,7 +218,7 @@ export default function AdmProductos() {
               <TextInput placeholder='Precio' onChangeText={(text) => setInputPrecio(text)} />
               <Text>Ingrese el stock</Text>
               <TextInput placeholder='Stock' onChangeText={(text) => setInputStock(text)} />
-              <Button title="Pick an image from camera roll" onPress={pickImage} />
+              <Button title="Seleccionar imagen" onPress={pickImage} />
               {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200 }} />}
               <Button
                 style={styles.button}
@@ -232,14 +233,34 @@ export default function AdmProductos() {
             </View>
           </View>
         </Modal>
-        <Modal visible={modalEdicionVisible} animationType={'slide'}>
+
+        {modalEdicionVisible ? (<Modal visible={modalEdicionVisible} animationType={'slide'}>
           <View style={styles.modalBackGround}>
             <View style={styles.modalContainer}>
-              <Text>Cambiar nombre</Text>
-              <TextInput placeholder='Nuevo nombre' onChangeText={(text) => inputNombre = text} />
+              <Text>Nombre</Text>
+              <TextInput placeholder={productosEdit.nombre} onChangeText={(text) => setInputNombre(text)} />
+              <DropDownPicker
+                schema={{
+                  label: 'nombre',
+                  value: 'id'
+                }}
+                placeholder="Seleccione una categoria"
+                open={abrirDrop}
+                value={valorDrop}
+                items={arrayCategorias}
+                setOpen={setAbrirDrop}
+                setValue={setValorDrop}
+                setItems={setArrayCategorias}
+              />
+              <Text>Descripción</Text>
+              <TextInput placeholder={productosEdit.descripcion} onChangeText={(text) => setInputDescripcion(text)} />
+              <Text>Precio</Text>
+              <TextInput placeholder={productosEdit.precio.toString()} onChangeText={(text) => setInputPrecio(text)} />
+              <Text>Stock</Text>
+              <TextInput placeholder={productosEdit.stock.toString()} onChangeText={(text) => setInputStock(text)} />
               <Button
                 style={styles.button}
-                title="Cambiar"
+                title="Actualizar"
                 onPress={() => { EditarProducto() }}
               />
               <Button
@@ -249,7 +270,9 @@ export default function AdmProductos() {
               />
             </View>
           </View>
-        </Modal>
+        </Modal>):(<View></View>)}
+
+        
         <Modal visible={modalBorrarVisible} animationType={'slide'}>
           <View style={styles.modalBackGround}>
             <View style={styles.modalContainer}>
