@@ -18,17 +18,23 @@ export default function AdmProductos() {
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
   const url = `${baseUrl}/api/productos`
-  const urlProdActivos = `${baseUrl}/api/productosActivos`
+  const urlActivos = `${baseUrl}/api/productosActivos`
+  const urlInactivos = `${baseUrl}/api/productosInactivos`
+
   const urlCategorias = `${baseUrl}/api/categorias`
   const urlImagen = `${baseUrl}/api/imagens`
 
   //UseState
   const [arrayProductos, setArrayProductos] = useState([])
+  const [arrayProductosActivas, setArrayProductosActivas] = useState([])
+  const [arrayProductosInactivas, setArrayProductosInactivas] = useState([])
   const [arrayCategorias, setArrayCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalEdicionVisible, setEdicionModalVisible] = useState(false)
   const [modalBorrarVisible, setBorrarModalVisible] = useState(false)
+  const [modalInactivosVisible, setInactivosModalVisible] = useState(false)
+  const [modalHabilitarVisible, setHabilitarModalVisible] = useState(false)
   const [productosEdit, setProductosEdit] = useState()
   const [abrirDrop, setAbrirDrop] = useState(false);
   const [valorDrop, setValorDrop] = useState(null);
@@ -53,12 +59,16 @@ export default function AdmProductos() {
   //Llamado GET a api
   const fetchAllAxios = async () => {
     let api = [
-      urlProdActivos,
+      url,
+      urlActivos,
+      urlInactivos,
       urlCategorias,
     ];
     try {
-      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: categorias }]) => {
+      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }]) => {
         setArrayProductos(await productos)
+        setArrayProductosActivas(await prodActivos)
+        setArrayProductosInactivas(await prodInactivos)
         setArrayCategorias(await categorias)
       });
       setCargando(false)
@@ -136,12 +146,24 @@ export default function AdmProductos() {
     }
   }
 
-  const BorrarProducto = async () => {
-    let urlBorrar = `${url}/${productosEdit.id}`
+  const InHabilitarCategoria = async () => {
+    let urlInhabilitar = `${url}/${productosEdit.id}`
+    console.log(urlInhabilitar)
     try {
-      const response = await axios.delete(urlBorrar)
+      const response = await axios.put(urlInhabilitar, {estado:0})
       console.log(response.data)
-      await fetchAllAxios()
+      fetchAllAxios()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const HabilitarCategoria = async () => {
+    let urlHabilitar = `${url}/${productosEdit.id}`
+    console.log(urlHabilitar)
+    try {
+      const response = await axios.put(urlHabilitar, {estado:1})
+      console.log(response.data)
     } catch (error) {
       console.log(error)
     }
@@ -170,6 +192,11 @@ export default function AdmProductos() {
     setBorrarModalVisible(true)
   }
 
+  const ModalHabilitar = (producto) => {
+    setProductosEdit(producto)
+    setHabilitarModalVisible(true)
+  }
+
   const Item = ({ title }) => (
     <View style={styles.item}>
       <Text style={styles.text}>{title.nombre}</Text>
@@ -190,12 +217,32 @@ export default function AdmProductos() {
     <Item title={item} />
   )
 
+  const Item2 = ({ title }) => (
+    <View style={styles.item}>
+      <Text style={styles.text}>{title.nombre}</Text>
+
+      <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
+        <Image style={styles.image} source={require("../src/images/editar.png")} />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => { ModalHabilitar(title) }}>
+        <Image style={styles.image} source={require("../src/images/borrar.png")} />
+      </TouchableOpacity>
+      <Image source={{ uri: title.urlImagen }}
+        style={{ width: 200, height: 200, backgroundColor: '#859a9b' }}
+      />
+    </View>
+  )
+
+  const renderItem2 = ({ item }) => (
+    <Item2 title={item} />
+  )
+
   return (
     <View>
       {cargando == true ? (<Text>Cargando</Text>) : (<View style={styles.viewBody}>
         <FlatList
           style={styles.flatList}
-          data={arrayProductos}
+          data={arrayProductosActivas}
           renderItem={renderItem}
           keyExtractor={item => item.id}
         />
@@ -204,6 +251,11 @@ export default function AdmProductos() {
           title="Agregar producto"
           onPress={() => { console.log(setModalVisible(true)) }}
         />
+        <Button
+        style={styles.button}
+        title="Ver categorias inactivas"
+        onPress={() => { setInactivosModalVisible(true) }}
+      />
         <Modal visible={modalVisible} animationType={'slide'}>
           <View style={styles.modalBackGround}>
             <View style={styles.modalContainer}>
@@ -282,16 +334,14 @@ export default function AdmProductos() {
             </View>
           </View>
         </Modal>):(<View></View>)}
-
-        
         <Modal visible={modalBorrarVisible} animationType={'slide'}>
           <View style={styles.modalBackGround}>
             <View style={styles.modalContainer}>
-              <Text>¿Está seguro que desea eliminar la categoria?</Text>
+              <Text>¿Está seguro que desea deshabilitar el producto?</Text>
               <Button
                 style={styles.button}
                 title="Sí"
-                onPress={() => { BorrarProducto().then(fetchAllAxios()).then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
+                onPress={() => { InHabilitarCategoria().then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
               />
               <Button
                 style={styles.button}
@@ -301,6 +351,36 @@ export default function AdmProductos() {
             </View>
           </View>
         </Modal>
+        <Modal visible={modalInactivosVisible} animationType={'slide'}>
+        <FlatList
+          style={styles.flatList}
+          data={arrayProductosInactivas}
+          renderItem={renderItem2}
+          keyExtractor={item => item.id}
+        />
+        <Button
+          style={styles.button}
+          title="Volver"
+          onPress={() => { setInactivosModalVisible(false) }}
+        />
+      </Modal>
+      <Modal visible={modalHabilitarVisible} animationType={'slide'}>
+        <View style={styles.modalBackGround}>
+          <View style={styles.modalContainer}>
+            <Text>¿Está seguro que desea habilitar la categoria?</Text>
+            <Button
+              style={styles.button}
+              title="Sí"
+              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
+            />
+            <Button
+              style={styles.button}
+              title="Cancelar"
+              onPress={() => { setHabilitarModalVisible(false) }}
+            />
+          </View>
+        </View>
+      </Modal>
       </View>)}
     </View>
   )
