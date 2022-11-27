@@ -10,6 +10,7 @@ import Administrador from '../Administrador'
 import AdmCategorias from '../AdmCategorias'
 import AdmProductos from '../AdmProductos'
 import AdmMesas from '../AdmMesas'
+import CategoriasInactivas from '../CategoriasInactivas'
 
 import { NavigationContainer } from '@react-navigation/native'
 import Principal from '../Principal'
@@ -64,6 +65,11 @@ export default function RestaurantStack() {
                 name="admMesas"
                 component={AdmMesas}
                 options={{title:"Administrar mesas"}}
+            />
+            <Stack.Screen
+                name="categoriasInactivas"
+                component={CategoriasInactivas}
+                options={{title:"Categorias Inactivas"}}
             />
         </Stack.Navigator>
     </NavigationContainer>
