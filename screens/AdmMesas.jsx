@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
-import React, { useState, useEffect} from 'react'
+import React, { useState, useEffect,useContext} from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 import { TextInput } from 'react-native'
+
+import RestaurantContext from '../src/components/RestaurantContext'
 
 const width = Dimensions.get('window')
 
@@ -12,6 +14,9 @@ export default function AdmMesas() {
 
   //Asignacion a constante de UseNavigation
   const navigation = useNavigation()
+
+  //UseContext
+  const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext,categoriasActivas, setCategoriasActivas,mesasActivas, setMesasActivas, } = useContext(RestaurantContext)
 
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
@@ -21,7 +26,6 @@ export default function AdmMesas() {
 
   //UseState
   const [arrayMesas, setArrayMesas] = useState([])
-  const [arrayMesasActivas, setArrayMesasActivas] = useState([])
   const [arrayMesasInactivas, setArrayMesasInactivas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
@@ -51,7 +55,7 @@ export default function AdmMesas() {
     try {
       await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: categorias }, { data: mesasActivos }, { data: mesasInactivos }]) => {
         setArrayMesas(await categorias)
-        setArrayMesasActivas(await mesasActivos)
+        setMesasActivas(await mesasActivos)
         setArrayMesasInactivas(await mesasInactivos)
       });
       setCargando(false)
@@ -92,17 +96,6 @@ export default function AdmMesas() {
     }
   }
 
-  const HabilitarCategoria = async () => {
-    let urlHabilitar = `${url}/${mesaEdit.id}`
-    console.log(urlHabilitar)
-    try {
-      const response = await axios.put(urlHabilitar, {estado:1})
-      console.log(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   //Formatear inputs
   const FormatearInputs = () =>{
     inputMesas = ""
@@ -117,11 +110,6 @@ export default function AdmMesas() {
   const ModalBorrar = (mesa) => {
     setMesaEdit(mesa)
     setBorrarModalVisible(true)
-  }
-
-  const ModalHabilitar = (mesa) => {
-    setMesaEdit(mesa)
-    setHabilitarModalVisible(true)
   }
 
   const Item = ({ title }) => (
@@ -140,27 +128,11 @@ export default function AdmMesas() {
     <Item title={item} />
   )
 
-  const Item2 = ({ title }) => (
-    <View style={styles.item}>
-      <Text style={styles.text}>{title.numMesa}</Text>
-      <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
-        <Image style={styles.image} source={require("../src/images/editar.png")} />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => { ModalHabilitar(title) }}>
-        <Image style={styles.image} source={require("../src/images/borrar.png")} />
-      </TouchableOpacity>
-    </View>
-  )
-
-  const renderItem2 = ({ item }) => (
-    <Item2 title={item} />
-  )
-
   return (
     <View style={styles.viewBody}>
       <FlatList
         style={styles.flatList}
-        data={arrayMesasActivas}
+        data={mesasActivas}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
@@ -172,7 +144,7 @@ export default function AdmMesas() {
       <Button
         style={styles.button}
         title="Ver mesas inactivas"
-        onPress={() => { setInactivosModalVisible(true) }}
+        onPress={() => { navigation.navigate("mesasInactivas") }}
       />
       <Modal visible={modalVisible} animationType={'slide'}>
         <View style={styles.modalBackGround}>
@@ -223,36 +195,6 @@ export default function AdmMesas() {
               style={styles.button}
               title="Cancelar"
               onPress={() => { setBorrarModalVisible(false)}}
-            />
-          </View>
-        </View>
-      </Modal>
-      <Modal visible={modalInactivosVisible} animationType={'slide'}>
-        <FlatList
-          style={styles.flatList}
-          data={arrayMesasInactivas}
-          renderItem={renderItem2}
-          keyExtractor={item => item.id}
-        />
-        <Button
-          style={styles.button}
-          title="Volver"
-          onPress={() => { setInactivosModalVisible(false) }}
-        />
-      </Modal>
-      <Modal visible={modalHabilitarVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
-            <Text>¿Está seguro que desea habilitar la mesa?</Text>
-            <Button
-              style={styles.button}
-              title="Sí"
-              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
-            />
-            <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setHabilitarModalVisible(false) }}
             />
           </View>
         </View>

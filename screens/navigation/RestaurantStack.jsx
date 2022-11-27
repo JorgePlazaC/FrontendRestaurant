@@ -11,6 +11,8 @@ import AdmCategorias from '../AdmCategorias'
 import AdmProductos from '../AdmProductos'
 import AdmMesas from '../AdmMesas'
 import CategoriasInactivas from '../CategoriasInactivas'
+import MesasInactivas from '../MesasInactivas'
+import ProductosActivos from '../ProductosInactivos'
 
 import { NavigationContainer } from '@react-navigation/native'
 import Principal from '../Principal'
@@ -70,6 +72,16 @@ export default function RestaurantStack() {
                 name="categoriasInactivas"
                 component={CategoriasInactivas}
                 options={{title:"Categorias Inactivas"}}
+            />
+            <Stack.Screen
+                name="mesasInactivas"
+                component={MesasInactivas}
+                options={{title:"Mesas Inactivas"}}
+            />
+            <Stack.Screen
+                name="productosInactivas"
+                component={ProductosActivos}
+                options={{title:"Productos Inactivos"}}
             />
         </Stack.Navigator>
     </NavigationContainer>

@@ -8,12 +8,17 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 import { TextInput } from 'react-native'
 
+import RestaurantContext from '../src/components/RestaurantContext'
+
 const width = Dimensions.get('window')
 
 export default function AdmProductos() {
 
   //Asignacion a constante de UseNavigation
   const navigation = useNavigation()
+
+  //UseContext
+  const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext,categoriasActivas, setCategoriasActivas,mesasActivas, setMesasActivas,productosActivas, setProductosActivas } = useContext(RestaurantContext)
 
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
@@ -26,7 +31,6 @@ export default function AdmProductos() {
 
   //UseState
   const [arrayProductos, setArrayProductos] = useState([])
-  const [arrayProductosActivas, setArrayProductosActivas] = useState([])
   const [arrayProductosInactivas, setArrayProductosInactivas] = useState([])
   const [arrayCategorias, setArrayCategorias] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -67,7 +71,7 @@ export default function AdmProductos() {
     try {
       await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }]) => {
         setArrayProductos(await productos)
-        setArrayProductosActivas(await prodActivos)
+        setProductosActivas(await prodActivos)
         setArrayProductosInactivas(await prodInactivos)
         setArrayCategorias(await categorias)
       });
@@ -158,17 +162,6 @@ export default function AdmProductos() {
     }
   }
 
-  const HabilitarCategoria = async () => {
-    let urlHabilitar = `${url}/${productosEdit.id}`
-    console.log(urlHabilitar)
-    try {
-      const response = await axios.put(urlHabilitar, {estado:1})
-      console.log(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   const Metodos = async () => {
     await uploadImage()
   }
@@ -192,11 +185,6 @@ export default function AdmProductos() {
     setBorrarModalVisible(true)
   }
 
-  const ModalHabilitar = (producto) => {
-    setProductosEdit(producto)
-    setHabilitarModalVisible(true)
-  }
-
   const Item = ({ title }) => (
     <View style={styles.item}>
       <Text style={styles.text}>{title.nombre}</Text>
@@ -217,32 +205,12 @@ export default function AdmProductos() {
     <Item title={item} />
   )
 
-  const Item2 = ({ title }) => (
-    <View style={styles.item}>
-      <Text style={styles.text}>{title.nombre}</Text>
-
-      <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
-        <Image style={styles.image} source={require("../src/images/editar.png")} />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => { ModalHabilitar(title) }}>
-        <Image style={styles.image} source={require("../src/images/borrar.png")} />
-      </TouchableOpacity>
-      <Image source={{ uri: title.urlImagen }}
-        style={{ width: 200, height: 200, backgroundColor: '#859a9b' }}
-      />
-    </View>
-  )
-
-  const renderItem2 = ({ item }) => (
-    <Item2 title={item} />
-  )
-
   return (
     <View>
       {cargando == true ? (<Text>Cargando</Text>) : (<View style={styles.viewBody}>
         <FlatList
           style={styles.flatList}
-          data={arrayProductosActivas}
+          data={productosActivas}
           renderItem={renderItem}
           keyExtractor={item => item.id}
         />
@@ -254,7 +222,7 @@ export default function AdmProductos() {
         <Button
         style={styles.button}
         title="Ver productos inactivos"
-        onPress={() => { setInactivosModalVisible(true) }}
+        onPress={() => { navigation.navigate("productosInactivas") }}
       />
         <Modal visible={modalVisible} animationType={'slide'}>
           <View style={styles.modalBackGround}>
@@ -351,36 +319,6 @@ export default function AdmProductos() {
             </View>
           </View>
         </Modal>
-        <Modal visible={modalInactivosVisible} animationType={'slide'}>
-        <FlatList
-          style={styles.flatList}
-          data={arrayProductosInactivas}
-          renderItem={renderItem2}
-          keyExtractor={item => item.id}
-        />
-        <Button
-          style={styles.button}
-          title="Volver"
-          onPress={() => { setInactivosModalVisible(false) }}
-        />
-      </Modal>
-      <Modal visible={modalHabilitarVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
-            <Text>¿Está seguro que desea habilitar la categoria?</Text>
-            <Button
-              style={styles.button}
-              title="Sí"
-              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
-            />
-            <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setHabilitarModalVisible(false) }}
-            />
-          </View>
-        </View>
-      </Modal>
       </View>)}
     </View>
   )

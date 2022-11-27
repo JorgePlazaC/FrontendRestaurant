@@ -127,11 +127,6 @@ export default function CategoriasInactivas() {
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
-      <Button
-        style={styles.button}
-        title="Volver"
-        onPress={() => { navigation.navigate("admCategorias") }}
-      />
 
       <Portal>
         <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>

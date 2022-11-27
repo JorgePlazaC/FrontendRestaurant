@@ -27,14 +27,11 @@ export default function AdmCategorias() {
 
   //UseState
   const [arrayCategorias, setArrayCategorias] = useState([])
-  const [arrayCategoriasActivas, setArrayCategoriasActivas] = useState([])
   const [arrayCategoriasInactivas, setArrayCategoriasInactivas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalEdicionVisible, setEdicionModalVisible] = useState(false)
   const [modalBorrarVisible, setBorrarModalVisible] = useState(false)
-  const [modalInactivosVisible, setInactivosModalVisible] = useState(false)
-  const [modalHabilitarVisible, setHabilitarModalVisible] = useState(false)
   const [categoriaEdit, setCategoriaEdit] = useState()
 
   //Varibales inputs de pantalla
@@ -98,17 +95,6 @@ export default function AdmCategorias() {
     }
   }
 
-  const HabilitarCategoria = async () => {
-    let urlHabilitar = `${url}/${categoriaEdit.id}`
-    console.log(urlHabilitar)
-    try {
-      const response = await axios.put(urlHabilitar, { estado: 1 })
-      console.log(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   //Formatear inputs
   const FormatearInputs = () => {
     inputCategoria = ""
@@ -123,11 +109,6 @@ export default function AdmCategorias() {
   const ModalBorrar = (categoria) => {
     setCategoriaEdit(categoria)
     setBorrarModalVisible(true)
-  }
-
-  const ModalHabilitar = (categoria) => {
-    setCategoriaEdit(categoria)
-    setHabilitarModalVisible(true)
   }
 
   const Item = ({ title }) => (
@@ -148,26 +129,9 @@ export default function AdmCategorias() {
     <Item title={item} />
   )
 
-  const Item2 = ({ title }) => (
-    <View style={styles.item}>
-      <Text style={styles.text}>{title.nombre}</Text>
-      <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
-        <Image style={styles.image} source={require("../src/images/editar.png")} />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => { ModalHabilitar(title) }}>
-        <Image style={styles.image} source={require("../src/images/borrar.png")} />
-      </TouchableOpacity>
-    </View>
-  )
-
-  const renderItem2 = ({ item }) => (
-    <Item2 title={item} />
-  )
-
   const ocultarModalAgregar = () => setModalVisible(false);
   const ocultarModalEdicion = () => setEdicionModalVisible(false);
   const ocultarModalBorrar = () => setBorrarModalVisible(false);
-  const ocultarModalHabilitar = () => setHabilitarModalVisible(false);
   return (
     <View >
       <FlatList
@@ -249,38 +213,6 @@ export default function AdmCategorias() {
           </Dialog.Content>
         </Dialog>
       </Portal>
-      <Portal>
-        <Dialog visible={modalHabilitarVisible} onDismiss={ocultarModalHabilitar}>
-          <Dialog.Content>
-          <Text>¿Está seguro que desea habilitar la categoria?</Text>
-            <Button
-              style={styles.button}
-              title="Sí"
-              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
-            />
-            <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setHabilitarModalVisible(false) }}
-            />
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
-
-
-      <Modal visible={modalInactivosVisible} animationType={'slide'}>
-        <FlatList
-          style={styles.flatList}
-          data={arrayCategoriasInactivas}
-          renderItem={renderItem2}
-          keyExtractor={item => item.id}
-        />
-        <Button
-          style={styles.button}
-          title="Volver"
-          onPress={() => { setInactivosModalVisible(false) }}
-        />
-      </Modal>
     </View>
   )
 }
