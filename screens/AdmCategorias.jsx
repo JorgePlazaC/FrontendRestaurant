@@ -4,7 +4,8 @@ import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
-import { TextInput } from 'react-native'
+//import { TextInput } from 'react-native'
+import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
 
 const width = Dimensions.get('window')
 
@@ -85,7 +86,7 @@ export default function AdmCategorias() {
     let urlInhabilitar = `${url}/${categoriaEdit.id}`
     console.log(urlInhabilitar)
     try {
-      const response = await axios.put(urlInhabilitar, {estado:0})
+      const response = await axios.put(urlInhabilitar, { estado: 0 })
       console.log(response.data)
     } catch (error) {
       console.log(error)
@@ -96,7 +97,7 @@ export default function AdmCategorias() {
     let urlHabilitar = `${url}/${categoriaEdit.id}`
     console.log(urlHabilitar)
     try {
-      const response = await axios.put(urlHabilitar, {estado:1})
+      const response = await axios.put(urlHabilitar, { estado: 1 })
       console.log(response.data)
     } catch (error) {
       console.log(error)
@@ -125,7 +126,8 @@ export default function AdmCategorias() {
   }
 
   const Item = ({ title }) => (
-    <View style={styles.item}>
+    <View style={styles.viewBody}>
+      <Divider />
       <Text style={styles.text}>{title.nombre}</Text>
       <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
         <Image style={styles.image} source={require("../src/images/editar.png")} />
@@ -133,6 +135,7 @@ export default function AdmCategorias() {
       <TouchableOpacity style={styles.button} onPress={() => { ModalBorrar(title) }}>
         <Image style={styles.image} source={require("../src/images/borrar.png")} />
       </TouchableOpacity>
+      <Divider />
     </View>
   )
 
@@ -156,8 +159,12 @@ export default function AdmCategorias() {
     <Item2 title={item} />
   )
 
+  const ocultarModalAgregar = () => setModalVisible(false);
+  const ocultarModalEdicion = () => setEdicionModalVisible(false);
+  const ocultarModalBorrar = () => setBorrarModalVisible(false);
+  const ocultarModalHabilitar = () => setHabilitarModalVisible(false);
   return (
-    <View style={styles.viewBody}>
+    <View >
       <FlatList
         style={styles.flatList}
         data={arrayCategoriasActivas}
@@ -174,11 +181,16 @@ export default function AdmCategorias() {
         title="Ver categorias inactivas"
         onPress={() => { setInactivosModalVisible(true) }}
       />
-      <Modal visible={modalVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
+      <Portal>
+        <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
+          <Dialog.Content>
             <Text>Ingrese el nombre de la categoria</Text>
-            <TextInput placeholder='Categoria' onChangeText={(text) => inputCategoria = text} />
+            <TextInput
+              placeholder='Nombre categoria'
+              mode='outlined'
+              onChangeText={text => inputCategoria = text}
+            />
+
             <Button
               style={styles.button}
               title="Confirmar"
@@ -189,14 +201,19 @@ export default function AdmCategorias() {
               title="Cancelar"
               onPress={() => { setModalVisible(false) }}
             />
-          </View>
-        </View>
-      </Modal>
-      <Modal visible={modalEdicionVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+      <Portal>
+        <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
+          <Dialog.Content>
+            <Text>Ingrese el nombre de la categoria</Text>
             <Text>Cambiar nombre</Text>
-            <TextInput placeholder='Nuevo nombre' onChangeText={(text) => inputCategoria = text} />
+            <TextInput
+              placeholder='Nuevo nombre'
+              mode='outlined'
+              onChangeText={(text) => inputCategoria = text}
+            />
             <Button
               style={styles.button}
               title="Actualizar"
@@ -207,13 +224,13 @@ export default function AdmCategorias() {
               title="Cancelar"
               onPress={() => { setEdicionModalVisible(false) }}
             />
-          </View>
-        </View>
-      </Modal>
-      <Modal visible={modalBorrarVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
-            <Text>¿Está seguro que desea deshabilitar la categoria?</Text>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+      <Portal>
+        <Dialog visible={modalBorrarVisible} onDismiss={ocultarModalBorrar}>
+          <Dialog.Content>
+          <Text>¿Está seguro que desea deshabilitar la categoria?</Text>
             <Button
               style={styles.button}
               title="Sí"
@@ -224,9 +241,28 @@ export default function AdmCategorias() {
               title="Cancelar"
               onPress={() => { setBorrarModalVisible(false) }}
             />
-          </View>
-        </View>
-      </Modal>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+      <Portal>
+        <Dialog visible={modalHabilitarVisible} onDismiss={ocultarModalHabilitar}>
+          <Dialog.Content>
+          <Text>¿Está seguro que desea habilitar la categoria?</Text>
+            <Button
+              style={styles.button}
+              title="Sí"
+              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
+            />
+            <Button
+              style={styles.button}
+              title="Cancelar"
+              onPress={() => { setHabilitarModalVisible(false) }}
+            />
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+
+
       <Modal visible={modalInactivosVisible} animationType={'slide'}>
         <FlatList
           style={styles.flatList}
@@ -239,23 +275,6 @@ export default function AdmCategorias() {
           title="Volver"
           onPress={() => { setInactivosModalVisible(false) }}
         />
-      </Modal>
-      <Modal visible={modalHabilitarVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
-            <Text>¿Está seguro que desea habilitar la categoria?</Text>
-            <Button
-              style={styles.button}
-              title="Sí"
-              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
-            />
-            <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setHabilitarModalVisible(false) }}
-            />
-          </View>
-        </View>
       </Modal>
     </View>
   )
@@ -299,5 +318,8 @@ const styles = StyleSheet.create({
     maxHeight: 20,
     maxWidth: 20,
     marginBottom: 20,
+  },
+  flatList: {
+    maxHeight: width.height - 150,
   }
 })

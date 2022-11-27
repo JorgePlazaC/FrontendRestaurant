@@ -253,7 +253,7 @@ export default function AdmProductos() {
         />
         <Button
         style={styles.button}
-        title="Ver categorias inactivas"
+        title="Ver productos inactivos"
         onPress={() => { setInactivosModalVisible(true) }}
       />
         <Modal visible={modalVisible} animationType={'slide'}>
