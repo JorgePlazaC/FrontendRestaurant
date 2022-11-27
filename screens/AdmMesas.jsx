@@ -16,13 +16,19 @@ export default function AdmMesas() {
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
   const url = `${baseUrl}/api/mesas`
+  const urlActivos = `${baseUrl}/api/mesasActivos`
+  const urlInactivos = `${baseUrl}/api/mesasInactivos`
 
   //UseState
   const [arrayMesas, setArrayMesas] = useState([])
+  const [arrayMesasActivas, setArrayMesasActivas] = useState([])
+  const [arrayMesasInactivas, setArrayMesasInactivas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalEdicionVisible, setEdicionModalVisible] = useState(false)
   const [modalBorrarVisible, setBorrarModalVisible] = useState(false)
+  const [modalInactivosVisible, setInactivosModalVisible] = useState(false)
+  const [modalHabilitarVisible, setHabilitarModalVisible] = useState(false)
   const [mesaEdit, setMesaEdit] = useState()
 
   //Varibales inputs de pantalla
@@ -30,22 +36,27 @@ export default function AdmMesas() {
 
   useEffect(() => {
     (async () => {
-      await fetchMesas()
+      await fetchAllAxios()
     })()
   }, [])
 
 
   //Llamado GET a api
-  const fetchMesas = async () => {
+  const fetchAllAxios = async () => {
+    let api = [
+      url,
+      urlActivos,
+      urlInactivos
+    ];
     try {
-      const response = await axios.get(url)
-      setArrayMesas(response.data)
+      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: categorias }, { data: mesasActivos }, { data: mesasInactivos }]) => {
+        setArrayMesas(await categorias)
+        setArrayMesasActivas(await mesasActivos)
+        setArrayMesasInactivas(await mesasInactivos)
+      });
       setCargando(false)
-      console.log(arrayMesas)
     } catch (error) {
-
       console.log(error)
-      console.log({ url })
     }
   }
 
@@ -70,11 +81,22 @@ export default function AdmMesas() {
     }
   }
 
-  const BorrarCategoria = async () => {
-    let urlBorrar = `${url}/${mesaEdit.id}`
-    console.log(urlBorrar)
+  const InHabilitarCategoria = async () => {
+    let urlInhabilitar = `${url}/${mesaEdit.id}`
+    console.log(urlInhabilitar)
     try {
-      const response = await axios.delete(urlBorrar)
+      const response = await axios.put(urlInhabilitar, {estado:0})
+      console.log(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const HabilitarCategoria = async () => {
+    let urlHabilitar = `${url}/${mesaEdit.id}`
+    console.log(urlHabilitar)
+    try {
+      const response = await axios.put(urlHabilitar, {estado:1})
       console.log(response.data)
     } catch (error) {
       console.log(error)
@@ -97,6 +119,11 @@ export default function AdmMesas() {
     setBorrarModalVisible(true)
   }
 
+  const ModalHabilitar = (mesa) => {
+    setMesaEdit(mesa)
+    setHabilitarModalVisible(true)
+  }
+
   const Item = ({ title }) => (
     <View style={styles.item}>
       <Text style={styles.text}>{title.numMesa}</Text>
@@ -113,11 +140,27 @@ export default function AdmMesas() {
     <Item title={item} />
   )
 
+  const Item2 = ({ title }) => (
+    <View style={styles.item}>
+      <Text style={styles.text}>{title.numMesa}</Text>
+      <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
+        <Image style={styles.image} source={require("../src/images/editar.png")} />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => { ModalHabilitar(title) }}>
+        <Image style={styles.image} source={require("../src/images/borrar.png")} />
+      </TouchableOpacity>
+    </View>
+  )
+
+  const renderItem2 = ({ item }) => (
+    <Item2 title={item} />
+  )
+
   return (
     <View style={styles.viewBody}>
       <FlatList
         style={styles.flatList}
-        data={arrayMesas}
+        data={arrayMesasActivas}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
@@ -125,6 +168,11 @@ export default function AdmMesas() {
         style={styles.button}
         title="Agregar mesa"
         onPress={() => { console.log(setModalVisible(true)) }}
+      />
+      <Button
+        style={styles.button}
+        title="Ver mesas inactivas"
+        onPress={() => { setInactivosModalVisible(true) }}
       />
       <Modal visible={modalVisible} animationType={'slide'}>
         <View style={styles.modalBackGround}>
@@ -134,7 +182,7 @@ export default function AdmMesas() {
             <Button
               style={styles.button}
               title="Confirmar"
-              onPress={() => { Confirmar().then(fetchMesas).then(FormatearInputs()).finally(setModalVisible(false)) }}
+              onPress={() => { Confirmar().then(fetchAllAxios()).then(FormatearInputs()).finally(setModalVisible(false)) }}
             />
             <Button
               style={styles.button}
@@ -152,7 +200,7 @@ export default function AdmMesas() {
             <Button
               style={styles.button}
               title="Actualizar"
-              onPress={() => { EditarCategoria().then(fetchMesas).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
+              onPress={() => { EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
             />
             <Button
               style={styles.button}
@@ -165,16 +213,46 @@ export default function AdmMesas() {
       <Modal visible={modalBorrarVisible} animationType={'slide'}>
         <View style={styles.modalBackGround}>
           <View style={styles.modalContainer}>
-            <Text>¿Está seguro que desea eliminar la mesa?</Text>
+            <Text>¿Está seguro que desea deshabilitar la mesa?</Text>
             <Button
               style={styles.button}
               title="Sí"
-              onPress={() => { BorrarCategoria().then(fetchMesas).then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
+              onPress={() => { InHabilitarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
             />
             <Button
               style={styles.button}
               title="Cancelar"
               onPress={() => { setBorrarModalVisible(false)}}
+            />
+          </View>
+        </View>
+      </Modal>
+      <Modal visible={modalInactivosVisible} animationType={'slide'}>
+        <FlatList
+          style={styles.flatList}
+          data={arrayMesasInactivas}
+          renderItem={renderItem2}
+          keyExtractor={item => item.id}
+        />
+        <Button
+          style={styles.button}
+          title="Volver"
+          onPress={() => { setInactivosModalVisible(false) }}
+        />
+      </Modal>
+      <Modal visible={modalHabilitarVisible} animationType={'slide'}>
+        <View style={styles.modalBackGround}>
+          <View style={styles.modalContainer}>
+            <Text>¿Está seguro que desea habilitar la mesa?</Text>
+            <Button
+              style={styles.button}
+              title="Sí"
+              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
+            />
+            <Button
+              style={styles.button}
+              title="Cancelar"
+              onPress={() => { setHabilitarModalVisible(false) }}
             />
           </View>
         </View>
