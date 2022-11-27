@@ -3,7 +3,6 @@ import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Modal } from 'react-native'
 //import { TextInput } from 'react-native'
 import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
 

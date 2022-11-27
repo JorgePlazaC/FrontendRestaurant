@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
-import React, { useState, useEffect,useContext} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
-import { TextInput } from 'react-native'
+//import { TextInput } from 'react-native'
+import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -16,7 +17,7 @@ export default function MesasInactivas() {
   const navigation = useNavigation()
 
   //UseContext
-  const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext,categoriasActivas, setCategoriasActivas,mesasActivas, setMesasActivas, } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext, categoriasActivas, setCategoriasActivas, mesasActivas, setMesasActivas, } = useContext(RestaurantContext)
 
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
@@ -80,7 +81,7 @@ export default function MesasInactivas() {
     let urlHabilitar = `${url}/${mesaEdit.id}`
     console.log(urlHabilitar)
     try {
-      const response = await axios.put(urlHabilitar, {estado:1})
+      const response = await axios.put(urlHabilitar, { estado: 1 })
       console.log(response.data)
     } catch (error) {
       console.log(error)
@@ -88,7 +89,7 @@ export default function MesasInactivas() {
   }
 
   //Formatear inputs
-  const FormatearInputs = () =>{
+  const FormatearInputs = () => {
     inputMesas = ""
   }
 
@@ -119,6 +120,9 @@ export default function MesasInactivas() {
     <Item title={item} />
   )
 
+  const ocultarModalEdicion = () => setEdicionModalVisible(false);
+  const ocultarModalHabilitar = () => setHabilitarModalVisible(false);
+
   return (
     <View style={styles.viewBody}>
       <FlatList
@@ -127,9 +131,9 @@ export default function MesasInactivas() {
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
-      <Modal visible={modalEdicionVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
+      <Portal>
+        <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
+          <Dialog.Content>
             <Text>Cambiar número de mesa</Text>
             <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
             <Button
@@ -142,12 +146,12 @@ export default function MesasInactivas() {
               title="Cancelar"
               onPress={() => { setEdicionModalVisible(false) }}
             />
-          </View>
-        </View>
-      </Modal>
-      <Modal visible={modalHabilitarVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+      <Portal>
+        <Dialog visible={modalHabilitarVisible} onDismiss={ocultarModalHabilitar}>
+          <Dialog.Content>
             <Text>¿Está seguro que desea habilitar la mesa?</Text>
             <Button
               style={styles.button}
@@ -159,9 +163,9 @@ export default function MesasInactivas() {
               title="Cancelar"
               onPress={() => { setHabilitarModalVisible(false) }}
             />
-          </View>
-        </View>
-      </Modal>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
     </View>
   )
 }

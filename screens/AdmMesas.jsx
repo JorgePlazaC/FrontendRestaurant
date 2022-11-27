@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
-import React, { useState, useEffect,useContext} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
-import { TextInput } from 'react-native'
+//import { TextInput } from 'react-native'
+import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -16,7 +17,7 @@ export default function AdmMesas() {
   const navigation = useNavigation()
 
   //UseContext
-  const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext,categoriasActivas, setCategoriasActivas,mesasActivas, setMesasActivas, } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext, categoriasActivas, setCategoriasActivas, mesasActivas, setMesasActivas, } = useContext(RestaurantContext)
 
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
@@ -89,7 +90,7 @@ export default function AdmMesas() {
     let urlInhabilitar = `${url}/${mesaEdit.id}`
     console.log(urlInhabilitar)
     try {
-      const response = await axios.put(urlInhabilitar, {estado:0})
+      const response = await axios.put(urlInhabilitar, { estado: 0 })
       console.log(response.data)
     } catch (error) {
       console.log(error)
@@ -97,7 +98,7 @@ export default function AdmMesas() {
   }
 
   //Formatear inputs
-  const FormatearInputs = () =>{
+  const FormatearInputs = () => {
     inputMesas = ""
   }
 
@@ -128,6 +129,10 @@ export default function AdmMesas() {
     <Item title={item} />
   )
 
+  const ocultarModalAgregar = () => setModalVisible(false);
+  const ocultarModalEdicion = () => setEdicionModalVisible(false);
+  const ocultarModalBorrar = () => setBorrarModalVisible(false);
+
   return (
     <View style={styles.viewBody}>
       <FlatList
@@ -146,9 +151,9 @@ export default function AdmMesas() {
         title="Ver mesas inactivas"
         onPress={() => { navigation.navigate("mesasInactivas") }}
       />
-      <Modal visible={modalVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
+      <Portal>
+        <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
+          <Dialog.Content>
             <Text>Ingrese el número de la mesa</Text>
             <TextInput placeholder='Número de mesa' onChangeText={(text) => inputMesas = text} />
             <Button
@@ -161,12 +166,12 @@ export default function AdmMesas() {
               title="Cancelar"
               onPress={() => { setModalVisible(false) }}
             />
-          </View>
-        </View>
-      </Modal>
-      <Modal visible={modalEdicionVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+      <Portal>
+        <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
+          <Dialog.Content>
             <Text>Cambiar número de mesa</Text>
             <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
             <Button
@@ -179,12 +184,12 @@ export default function AdmMesas() {
               title="Cancelar"
               onPress={() => { setEdicionModalVisible(false) }}
             />
-          </View>
-        </View>
-      </Modal>
-      <Modal visible={modalBorrarVisible} animationType={'slide'}>
-        <View style={styles.modalBackGround}>
-          <View style={styles.modalContainer}>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
+      <Portal>
+        <Dialog visible={modalBorrarVisible} onDismiss={ocultarModalBorrar}>
+          <Dialog.Content>
             <Text>¿Está seguro que desea deshabilitar la mesa?</Text>
             <Button
               style={styles.button}
@@ -194,11 +199,11 @@ export default function AdmMesas() {
             <Button
               style={styles.button}
               title="Cancelar"
-              onPress={() => { setBorrarModalVisible(false)}}
+              onPress={() => { setBorrarModalVisible(false) }}
             />
-          </View>
-        </View>
-      </Modal>
+          </Dialog.Content>
+        </Dialog>
+      </Portal>
     </View>
   )
 }

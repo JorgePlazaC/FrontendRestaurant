@@ -6,7 +6,8 @@ import DropDownPicker from 'react-native-dropdown-picker'
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
-import { TextInput } from 'react-native'
+//import { TextInput } from 'react-native'
+import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -18,7 +19,7 @@ export default function AdmProductos() {
   const navigation = useNavigation()
 
   //UseContext
-  const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext,categoriasActivas, setCategoriasActivas,mesasActivas, setMesasActivas,productosActivas, setProductosActivas } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext, categoriasActivas, setCategoriasActivas, mesasActivas, setMesasActivas, productosActivas, setProductosActivas } = useContext(RestaurantContext)
 
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
@@ -142,7 +143,7 @@ export default function AdmProductos() {
   const EditarProducto = async () => {
     let urlEdicion = `${url}/${productosEdit.id}`
     try {
-      const response = await axios.put(urlEdicion, { nombre: inputNombre,idCategoria:valorDrop, descripcion: inputDescripcion,precio:inputPrecio,stock:inputStock })
+      const response = await axios.put(urlEdicion, { nombre: inputNombre, idCategoria: valorDrop, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock })
       console.log(response.data)
       await fetchAllAxios()
     } catch (error) {
@@ -154,7 +155,7 @@ export default function AdmProductos() {
     let urlInhabilitar = `${url}/${productosEdit.id}`
     console.log(urlInhabilitar)
     try {
-      const response = await axios.put(urlInhabilitar, {estado:0})
+      const response = await axios.put(urlInhabilitar, { estado: 0 })
       console.log(response.data)
       fetchAllAxios()
     } catch (error) {
@@ -166,7 +167,7 @@ export default function AdmProductos() {
     await uploadImage()
   }
 
-  const FormatearInputs = () =>{
+  const FormatearInputs = () => {
     setInputNombre("")
     setValorDrop("")
     setInputDescripcion("")
@@ -205,6 +206,10 @@ export default function AdmProductos() {
     <Item title={item} />
   )
 
+  const ocultarModalAgregar = () => setModalVisible(false);
+  const ocultarModalEdicion = () => setEdicionModalVisible(false);
+  const ocultarModalBorrar = () => setBorrarModalVisible(false);
+
   return (
     <View>
       {cargando == true ? (<Text>Cargando</Text>) : (<View style={styles.viewBody}>
@@ -220,13 +225,13 @@ export default function AdmProductos() {
           onPress={() => { console.log(setModalVisible(true)) }}
         />
         <Button
-        style={styles.button}
-        title="Ver productos inactivos"
-        onPress={() => { navigation.navigate("productosInactivas") }}
-      />
-        <Modal visible={modalVisible} animationType={'slide'}>
-          <View style={styles.modalBackGround}>
-            <View style={styles.modalContainer}>
+          style={styles.button}
+          title="Ver productos inactivos"
+          onPress={() => { navigation.navigate("productosInactivas") }}
+        />
+        <Portal>
+          <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
+            <Dialog.Content>
               <Text>Ingrese el nombre</Text>
               <TextInput placeholder='Nombre' onChangeText={(text) => setInputNombre(text)} />
               <Text>Elija una categoria</Text>
@@ -261,13 +266,12 @@ export default function AdmProductos() {
                 title="Cancelar"
                 onPress={() => { setModalVisible(false) }}
               />
-            </View>
-          </View>
-        </Modal>
-
-        {modalEdicionVisible ? (<Modal visible={modalEdicionVisible} animationType={'slide'}>
-          <View style={styles.modalBackGround}>
-            <View style={styles.modalContainer}>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
+        {modalEdicionVisible ? (<Portal>
+          <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
+            <Dialog.Content>
               <Text>Nombre</Text>
               <TextInput placeholder={productosEdit.nombre} onChangeText={(text) => setInputNombre(text)} />
               <DropDownPicker
@@ -299,12 +303,12 @@ export default function AdmProductos() {
                 title="Cancelar"
                 onPress={() => { setEdicionModalVisible(false) }}
               />
-            </View>
-          </View>
-        </Modal>):(<View></View>)}
-        <Modal visible={modalBorrarVisible} animationType={'slide'}>
-          <View style={styles.modalBackGround}>
-            <View style={styles.modalContainer}>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>) : (<View></View>)}
+        <Portal>
+          <Dialog visible={modalBorrarVisible} onDismiss={ocultarModalBorrar}>
+            <Dialog.Content>
               <Text>¿Está seguro que desea deshabilitar el producto?</Text>
               <Button
                 style={styles.button}
@@ -316,9 +320,9 @@ export default function AdmProductos() {
                 title="Cancelar"
                 onPress={() => { setBorrarModalVisible(false) }}
               />
-            </View>
-          </View>
-        </Modal>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
       </View>)}
     </View>
   )
