@@ -16,7 +16,7 @@ export default function Menu({ navigation }) {
   const urlTodosProductos = `${baseUrl}/api/productos`
 
   //UseContext
-  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext } = useContext(RestaurantContext)
 
   //UseState
   const [arrayProductos, setArrayProductos] = useState([])
@@ -90,6 +90,7 @@ export default function Menu({ navigation }) {
         });
       })
       setArrayProductos(array)
+      setProductosContext(array)
       await axios.get(urlTodosProductos).then(function (response) {
         console.log(response);
         arrayTodosProductos = response.data
@@ -102,14 +103,14 @@ export default function Menu({ navigation }) {
       
 
       //setCargando(false)
-      console.log(arrayProductos)
+      console.log(productosContext)
       console.log(cargando)
 
     } catch (error) {
 
       console.log(error)
       console.log({ urlProductos })
-      console.log(arrayProductos)
+      console.log(productosContext)
       console.log(cargando)
     }
 
@@ -173,6 +174,10 @@ export default function Menu({ navigation }) {
 
     })
 
+    if(carro[0] === undefined){
+      return
+    }
+
     //Buscar el producto a eliminar
     if (arrayCarro[0] != undefined) {
       arrayCarro.forEach((element, index) => {
@@ -205,7 +210,7 @@ export default function Menu({ navigation }) {
   //Contador cantidad de productos
   const ContProductos = (producto, accion) => {
     let arrayTemp = []
-    arrayProductos.forEach(element => {
+    productosContext.forEach(element => {
       if (arrayTemp[0] === undefined) {
         arrayTemp[0] = element
       } else {
@@ -232,6 +237,7 @@ export default function Menu({ navigation }) {
     }
 
     setArrayProductos(arrayTemp)
+    setProductosContext(arrayTemp)
   }
 
   const Item = ({ title }) => (
@@ -258,12 +264,12 @@ export default function Menu({ navigation }) {
   return (
     <SafeAreaView >
       <View centerContent style={styles.viewBody}>
-        {cargando == true && arrayProductos[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>) :
+        {cargando == true && productosContext[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>) :
           (<View>
 
             <SectionList
               style={styles.sectionList}
-              sections={arrayProductos}
+              sections={productosContext}
               keyExtractor={(item, index) => item + index}
               renderSectionHeader={({ section: { title } }) => (
                 <Text style={styles.header}>{title}</Text>

@@ -15,7 +15,7 @@ export default function Resumen({ navigation }) {
   const urlPedido = `${baseUrl}/api/pedidos`
 
   //UseContext
-  const { mesa, setMesa, carro, setCarro } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext } = useContext(RestaurantContext)
 
   let total = 0
 
@@ -53,7 +53,6 @@ export default function Resumen({ navigation }) {
     }
 
   }
-
 
   const Item = ({ title }) => (
     <View style={styles.item}>
