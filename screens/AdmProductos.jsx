@@ -262,7 +262,14 @@ export default function AdmProductos() {
               <TextInput placeholder='Precio' onChangeText={(text) => setInputPrecio(text)} />
               <Text>Ingrese el stock</Text>
               <TextInput placeholder='Stock' onChangeText={(text) => setInputStock(text)} />
-              <Button title="Seleccionar imagen" onPress={pickImage} />
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  pickImage();
+                }}>
+                Seleccionar imagen
+              </Button>
               {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200 }} />}
               <Button
                 mode="contained"

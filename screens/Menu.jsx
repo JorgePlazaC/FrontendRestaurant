@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View, Button, SectionList, ActivityIndicator, Dimensions, Image, ListItem, StatusBar } from 'react-native'
+import { StyleSheet, Text, View, SectionList, ActivityIndicator, Dimensions, Image, ListItem, StatusBar } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
+import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 const width = Dimensions.get('window')
 
@@ -23,6 +25,9 @@ export default function Menu({ navigation }) {
   const [cargando, setCargando] = useState(true)
   const [obtenerMenuApi, setObtenerMenuApi] = useState(true)
   const [productos, setProductos] = useState([])
+  const [modalVisible, setModalVisible] = useState(false)
+  const [detalleProducto, setDetalleProducto] = useState()
+  const [contadorProducto, setContadorProducto] = useState()
 
   useEffect(() => {
     const ConsultarMenuApi = async () => {
@@ -117,7 +122,7 @@ export default function Menu({ navigation }) {
   }
 
   //Ingreso de datos y modificaciones a API
-  const AgregarAlCarro = (producto) => {
+  const AgregarAlCarro = () => {
 
 
     //Vaciar info carro
@@ -135,7 +140,7 @@ export default function Menu({ navigation }) {
     let encontrado = true
     if (arrayCarro[0] === undefined) {
       let pedido = Object.create(Carro)
-      pedido.producto = producto
+      pedido.producto = detalleProducto
       pedido.cantidad = 1
       arrayCarro[0] = pedido
       encontrado = false
@@ -143,7 +148,7 @@ export default function Menu({ navigation }) {
 
     if (encontrado) {
       arrayCarro.forEach((element, index) => {
-        if (element.producto.id === producto.id) {
+        if (element.producto.id === detalleProducto.id) {
           arrayCarro[index].cantidad++
           //element.producto.cantidad++
           encontrado = false
@@ -154,16 +159,16 @@ export default function Menu({ navigation }) {
 
     if (encontrado) {
       let pedido = Object.create(Carro)
-      pedido.producto = producto
+      pedido.producto = detalleProducto
       pedido.cantidad = 1
       arrayCarro.push(pedido)
     }
     setCarro(arrayCarro)
-    ContProductos(producto, true)
+    ContProductos(true)
     console.log(arrayCarro)
   }
 
-  const EliminarDelCarro = (producto) => {
+  const EliminarDelCarro = () => {
     //Vaciado de datos
     carro.forEach(elementCarro => {
       if (arrayCarro[0] === undefined) {
@@ -182,14 +187,14 @@ export default function Menu({ navigation }) {
     if (arrayCarro[0] != undefined) {
       arrayCarro.forEach((element, index) => {
         console.log(arrayCarro)
-        if (element.producto.id === producto.id) {
+        if (element.producto.id === detalleProducto.id) {
           if (element.cantidad > 1) {
             element.cantidad--
             console.log(element.cantidad)
-            ContProductos(producto, false)
+            ContProductos(false)
           } else if (element.cantidad === 1) {
             //element.slice(index,index+1)
-            ContProductos(producto, false)
+            ContProductos(false)
             arrayCarro.splice(index, 1)
           }
         }
@@ -208,7 +213,7 @@ export default function Menu({ navigation }) {
   }
 
   //Contador cantidad de productos
-  const ContProductos = (producto, accion) => {
+  const ContProductos = (accion) => {
     let arrayTemp = []
     productosContext.forEach(element => {
       if (arrayTemp[0] === undefined) {
@@ -221,16 +226,18 @@ export default function Menu({ navigation }) {
     if (accion) {
       arrayTemp.forEach((categoria) => {
         categoria.data.forEach((productoCategoria) => {
-          if (producto.id === productoCategoria.id) {
+          if (detalleProducto.id === productoCategoria.id) {
             productoCategoria.cant++
+            setContadorProducto(productoCategoria.cant)
           }
         })
       })
     } else {
       arrayTemp.forEach((categoria) => {
         categoria.data.forEach((productoCategoria) => {
-          if (producto.id === productoCategoria.id) {
+          if (detalleProducto.id === productoCategoria.id) {
             productoCategoria.cant--
+            setContadorProducto(productoCategoria.cant)
           }
         })
       })
@@ -240,26 +247,31 @@ export default function Menu({ navigation }) {
     setProductosContext(arrayTemp)
   }
 
+  const DetalleProducto = (producto) => {
+    setDetalleProducto(producto)
+    setContadorProducto(producto.cant)
+    setModalVisible(true)
+  }
+
   const Item = ({ title }) => (
     <View style={styles.container}>
-      <Image source={{ uri: title.urlImagen }}
-        style={{ width: 80, height: 80, backgroundColor: '#859a9b' }} />
-      <Text style={styles.textSection}>{title.nombre}</Text>
-      <Button
-        style={styles.buttonEliminar}
-        title="-"
-        onPress={() => { EliminarDelCarro(title) }}
-      />
-      <Text style={styles.textCont}>{title.cant}</Text>
-      <Button
-        style={styles.buttonAgregar}
-        title="+"
-        onPress={() => { AgregarAlCarro(title) }}
-      />
-
+      <TouchableOpacity
+        onPress={() => DetalleProducto(title)}>
+        <View style={styles.parent}>
+          <Image source={{ uri: title.urlImagen }}
+            style={styles.imageMenu} />
+          <View>
+            <Text style={styles.textSection}>{title.nombre}</Text>
+            <Text style={styles.textPrecio}>Precio: {title.precio}</Text>
+          </View>
+          <Text style={styles.textCont}>                                          </Text>
+        </View>
+        <Divider bold={true} />
+      </TouchableOpacity>
     </View>
   )
 
+  const ocultarModal = () => setModalVisible(false);
 
   return (
 
@@ -278,10 +290,49 @@ export default function Menu({ navigation }) {
             stickySectionHeadersEnabled
           />
           <Button
-            style={styles.button}
-            title="Siguiente"
-            onPress={() => { ConfirmarCarro() }}
-          />
+            mode="contained"
+            style={styles.buttonPaperModal}
+            onPress={() => {
+              ConfirmarCarro();
+            }}>
+            Siguiente
+          </Button>
+          <Portal>
+            <Dialog visible={modalVisible} onDismiss={ocultarModal}>
+              <Dialog.Content>
+                {modalVisible == false ? (<View><Text>Cargando</Text><ActivityIndicator /></View>) :
+                  (<View style={styles.viewModal}>
+                    <Text style={styles.textTitle}>{detalleProducto.nombre}</Text>
+                    <Image source={{ uri: detalleProducto.urlImagen }}
+                      style={styles.image} />
+                    <Text style={styles.textCont}>Descripción:</Text>
+                    <Text style={styles.textCont}>{detalleProducto.descripcion}</Text>
+                    <Text style={styles.textCont}>Precio: {detalleProducto.precio}</Text>
+                    <View style={styles.parentModal}>
+                      <Button
+                        mode="contained"
+                        style={styles.buttonPaperModal}
+                        onPress={() => {
+                          EliminarDelCarro();
+                        }}>
+                        -
+                      </Button>
+                      <Text>{contadorProducto}</Text>
+                      <Button
+                        mode="contained"
+                        style={styles.buttonPaperModal}
+                        onPress={() => {
+                          AgregarAlCarro();
+                        }}>
+                        +
+                      </Button>
+                    </View>
+                  </View>)}
+
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
+
 
         </View>)}
     </View>
@@ -294,7 +345,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: 'row',
     flexGrow: 0,
-
+    
   },
   viewBody: {
     marginHorizontal: 30,
@@ -315,8 +366,14 @@ const styles = StyleSheet.create({
     fontSize: 24
   },
   textSection: {
-    flex: 0.9,
-    height: 30
+    marginTop: 30,
+    marginLeft: 20,
+    fontSize: 20,
+  },
+  textPrecio: {
+    marginTop: 10,
+    marginLeft: 20,
+    fontSize: 14,
   },
   buttonAgregar: {
     flex: 0.25,
@@ -325,8 +382,12 @@ const styles = StyleSheet.create({
     flex: 0.25,
   },
   textCont: {
-    flex: 0.13,
+    marginTop: 3,
+    marginBottom: 2,
     textAlign: 'center',
+  },
+  textTitle: {
+    fontSize: 32,
   },
   sectionList: {
     backgroundColor: '#F2F2F2',
@@ -340,17 +401,44 @@ const styles = StyleSheet.create({
     backgroundColor: '#58ACFA'
   },
   buttonPaperModal: {
-    marginTop: 8,
+    marginTop: 10,
     marginBottom: 0,
-    marginHorizontal: 30,
-    backgroundColor: '#58ACFA'
+    marginHorizontal: 15,
+    maxHeight: 40,
+    backgroundColor: '#58ACFA',
   },
   parent: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-around",
   },
+  parentModal: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: 'center',
+  },
   divider: {
     marginTop: 8,
+  },
+  imageMenu: {
+
+    marginTop: 10,
+    marginBottom: 10,
+    width: 100,
+    height: 100,
+    backgroundColor: '#859a9b',
+    borderRadius: 20,
+  },
+  image: {
+    width: 180,
+    height: 180,
+    backgroundColor: '#859a9b',
+    marginTop: 8,
+    borderRadius: 20,
+
+  },
+  viewModal: {
+    justifyContent: "center",
+    alignItems: 'center',
   }
 })
