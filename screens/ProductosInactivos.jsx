@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -84,23 +84,28 @@ export default function ProductosActivos() {
     }
 
     const EditarProducto = async () => {
+        setCargando(true)
+        setEdicionModalVisible(false)
         let urlEdicion = `${url}/${productosEdit.id}`
         try {
             const response = await axios.put(urlEdicion, { nombre: inputNombre, idCategoria: valorDrop, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock })
-            console.log(response.data)
+            console.log(await response.data)
             await fetchAllAxios()
+            FormatearInputs()
         } catch (error) {
             console.log(error)
         }
     }
 
     const HabilitarCategoria = async () => {
+        setCargando(true)
+        setHabilitarModalVisible(false)
         let urlHabilitar = `${url}/${productosEdit.id}`
         console.log(urlHabilitar)
         try {
             const response = await axios.put(urlHabilitar, { estado: 1 })
+            console.log(await response.data)
             await fetchAllAxios()
-            console.log(response.data)
         } catch (error) {
             console.log(error)
         }
@@ -154,7 +159,9 @@ export default function ProductosActivos() {
 
     return (
         <View>
-            {cargando == true ? (<Text>Cargando</Text>) : (<View>
+            {cargando ? (<View>
+                <ActivityIndicator style={styles.activityIndicator} size="large" />
+            </View>) : (<View>
                 <FlatList
                     style={styles.flatList}
                     data={arrayProductosInactivas}
@@ -190,7 +197,7 @@ export default function ProductosActivos() {
                                 mode="contained"
                                 style={styles.buttonPaper}
                                 onPress={() => {
-                                    EditarProducto().then(FormatearInputs()).finally(setEdicionModalVisible(false));
+                                    EditarProducto();
                                 }}>
                                 Actualizar
                             </Button>
@@ -213,7 +220,7 @@ export default function ProductosActivos() {
                                 mode="contained"
                                 style={styles.buttonPaper}
                                 onPress={() => {
-                                    HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false));
+                                    HabilitarCategoria();
                                 }}>
                                 Sí
                             </Button>
@@ -306,5 +313,9 @@ const styles = StyleSheet.create({
     },
     divider: {
         marginTop: 8,
+    },
+    activityIndicator: {
+        marginTop: width.height / 3,
+
     }
 })

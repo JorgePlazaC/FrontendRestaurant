@@ -31,7 +31,7 @@ export default function Menu({ navigation }) {
 
   useEffect(() => {
     const ConsultarMenuApi = async () => {
-      await fetchCategoriasProductos().finally(setCargando(false))
+      await fetchCategoriasProductos()
       setObtenerMenuApi(false)
     }
     if (obtenerMenuApi) {
@@ -81,19 +81,18 @@ export default function Menu({ navigation }) {
 
       });
 
-      arrayId.forEach(async (id, index) => {
-
-        let nuevaUrl = urlProductos + "?idCategoria=" + id
-        await axios.get(nuevaUrl).then(function (response) {
-          console.log(response);
+      try {
+        arrayId.forEach(async (id, index) => {
+          let nuevaUrl = urlProductos + "?idCategoria=" + id
+          const response = await axios.get(nuevaUrl)
+          console.log(await response);
           let cont = index
 
-          array[cont].data = response.data
+          array[cont].data = await response.data
         })
-          .catch(function (error) {
-            console.log(error);
-          });
-      })
+      } catch (error) {
+        console.log(error)
+      }
       setArrayProductos(array)
       setProductosContext(array)
       await axios.get(urlTodosProductos).then(function (response) {
@@ -104,6 +103,8 @@ export default function Menu({ navigation }) {
         .catch(function (error) {
           console.log(error);
         });
+
+      setCargando(false)
 
 
 
@@ -276,7 +277,11 @@ export default function Menu({ navigation }) {
   return (
 
     <View centerContent style={styles.viewBody}>
-      {cargando == true && productosContext[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>) :
+      {cargando == true && productosContext[0] != undefined ?
+        (<View>
+          <ActivityIndicator style={styles.activityIndicator} size="large"/>
+        </View>)
+        :
         (<View>
 
           <SectionList
@@ -345,7 +350,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: 'row',
     flexGrow: 0,
-    
+
   },
   viewBody: {
     marginHorizontal: 30,
@@ -391,8 +396,8 @@ const styles = StyleSheet.create({
   },
   sectionList: {
     backgroundColor: '#F2F2F2',
-    minHeight: width.height - 150,
-    maxHeight: width.height - 150,
+    minHeight: width.height - 120,
+    maxHeight: width.height - 120,
   },
   buttonPaper: {
     marginTop: 3,
@@ -424,6 +429,7 @@ const styles = StyleSheet.create({
 
     marginTop: 10,
     marginBottom: 10,
+    marginLeft: 15,
     width: 100,
     height: 100,
     backgroundColor: '#859a9b',
@@ -440,5 +446,9 @@ const styles = StyleSheet.create({
   viewModal: {
     justifyContent: "center",
     alignItems: 'center',
+  },
+  activityIndicator: {
+    marginTop: width.height/3,
+    
   }
 })

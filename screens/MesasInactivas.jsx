@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -67,22 +67,29 @@ export default function MesasInactivas() {
   }
 
   const EditarCategoria = async () => {
+    setCargando(true)
+    setEdicionModalVisible(false)
     let urlEdicion = `${url}/${mesaEdit.id}`
     console.log(urlEdicion)
     try {
       const response = await axios.put(urlEdicion, { numMesa: inputMesas })
-      console.log(response.data)
+      console.log(await response.data)
+      await fetchAllAxios()
+      FormatearInputs()
     } catch (error) {
       console.log(error)
     }
   }
 
   const HabilitarCategoria = async () => {
+    setCargando(true)
+    setHabilitarModalVisible(false)
     let urlHabilitar = `${url}/${mesaEdit.id}`
     console.log(urlHabilitar)
     try {
       const response = await axios.put(urlHabilitar, { estado: 1 })
-      console.log(response.data)
+      console.log(await response.data)
+      fetchAllAxios()
     } catch (error) {
       console.log(error)
     }
@@ -128,59 +135,67 @@ export default function MesasInactivas() {
 
   return (
     <View>
-      <FlatList
-        style={styles.flatList}
-        data={arrayMesasInactivas}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
-      <Portal>
-        <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
-          <Dialog.Content>
-            <Text>Cambiar número de mesa</Text>
-            <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false));
-              }}>
-              Actualizar
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                setEdicionModalVisible(false);
-              }}>
-              Cancelar
-            </Button>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
-      <Portal>
-        <Dialog visible={modalHabilitarVisible} onDismiss={ocultarModalHabilitar}>
-          <Dialog.Content>
-            <Text>¿Está seguro que desea habilitar la mesa?</Text>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false));
-              }}>
-              Sí
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                setHabilitarModalVisible(false);
-              }}>
-              Cancelar
-            </Button>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
+      {cargando ? (<View>
+          <ActivityIndicator style={styles.activityIndicator} size="large" />
+        </View>)
+        :
+        (
+          <View>
+        <FlatList
+          style={styles.flatList}
+          data={arrayMesasInactivas}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+        />
+        <Portal>
+          <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
+            <Dialog.Content>
+              <Text>Cambiar número de mesa</Text>
+              <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  EditarCategoria();
+                }}>
+                Actualizar
+              </Button>
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  setEdicionModalVisible(false);
+                }}>
+                Cancelar
+              </Button>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
+        <Portal>
+          <Dialog visible={modalHabilitarVisible} onDismiss={ocultarModalHabilitar}>
+            <Dialog.Content>
+              <Text>¿Está seguro que desea habilitar la mesa?</Text>
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  HabilitarCategoria();
+                }}>
+                Sí
+              </Button>
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  setHabilitarModalVisible(false);
+                }}>
+                Cancelar
+              </Button>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
+      </View>
+        )}
     </View>
   )
 }
@@ -248,4 +263,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
   },
+  activityIndicator: {
+    marginTop: width.height/3,
+    
+  }
 })

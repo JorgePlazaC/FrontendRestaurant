@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity,ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -64,22 +64,30 @@ export default function CategoriasInactivas() {
   }
 
   const HabilitarCategoria = async () => {
+    setCargando(true)
     let urlHabilitar = `${url}/${categoriaEdit.id}`
     console.log(urlHabilitar)
     try {
       const response = await axios.put(urlHabilitar, { estado: 1 })
-      console.log(response.data)
+      console.log(await response.data)
+      setHabilitarModalVisible(false)
+      await fetchAllAxios()
+      
     } catch (error) {
       console.log(error)
     }
   }
 
   const EditarCategoria = async () => {
+    setCargando(true)
+    setEdicionModalVisible(false)
     let urlEdicion = `${url}/${categoriaEdit.id}`
     console.log(urlEdicion)
     try {
       const response = await axios.put(urlEdicion, { nombre: inputCategoria })
-      console.log(response.data)
+      console.log(await response.data)
+      await fetchAllAxios()
+      FormatearInputs()
     } catch (error) {
       console.log(error)
     }
@@ -123,66 +131,70 @@ export default function CategoriasInactivas() {
   const ocultarModalEdicion = () => setEdicionModalVisible(false);
   const ocultarModalHabilitar = () => setHabilitarModalVisible(false);
   return (
-    <View >
-      <FlatList
-        style={styles.flatList}
-        data={arrayCategoriasInactivas}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
+    <View>
+      {cargando ? (<View>
+        <ActivityIndicator style={styles.activityIndicator} size="large" />
+      </View>) : (<View >
+        <FlatList
+          style={styles.flatList}
+          data={arrayCategoriasInactivas}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+        />
 
-      <Portal>
-        <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
-          <Dialog.Content>
-            <Text>Ingrese el nombre de la categoria</Text>
-            <Text>Cambiar nombre</Text>
-            <TextInput
-              placeholder='Nuevo nombre'
-              mode='outlined'
-              onChangeText={(text) => inputCategoria = text}
-            />
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false));
-              }}>
-              Actualizar
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                setEdicionModalVisible(false);
-              }}>
-              Cancelar
-            </Button>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
-      <Portal>
-        <Dialog visible={modalHabilitarVisible} onDismiss={ocultarModalHabilitar}>
-          <Dialog.Content>
-            <Text>¿Está seguro que desea habilitar la categoria?</Text>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false));
-              }}>
-              Sí
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                setHabilitarModalVisible(false);
-              }}>
-              Cancelar
-            </Button>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
+        <Portal>
+          <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
+            <Dialog.Content>
+              <Text>Ingrese el nombre de la categoria</Text>
+              <Text>Cambiar nombre</Text>
+              <TextInput
+                placeholder='Nuevo nombre'
+                mode='outlined'
+                onChangeText={(text) => inputCategoria = text}
+              />
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  EditarCategoria();
+                }}>
+                Actualizar
+              </Button>
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  setEdicionModalVisible(false);
+                }}>
+                Cancelar
+              </Button>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
+        <Portal>
+          <Dialog visible={modalHabilitarVisible} onDismiss={ocultarModalHabilitar}>
+            <Dialog.Content>
+              <Text>¿Está seguro que desea habilitar la categoria?</Text>
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  HabilitarCategoria();
+                }}>
+                Sí
+              </Button>
+              <Button
+                mode="contained"
+                style={styles.buttonPaperModal}
+                onPress={() => {
+                  setHabilitarModalVisible(false);
+                }}>
+                Cancelar
+              </Button>
+            </Dialog.Content>
+          </Dialog>
+        </Portal>
+      </View>)}
     </View>
   )
 }
@@ -250,4 +262,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
   },
+  activityIndicator: {
+    marginTop: width.height/3,
+    
+  }
 })

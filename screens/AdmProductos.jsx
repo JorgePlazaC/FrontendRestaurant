@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity,ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -98,6 +98,8 @@ export default function AdmProductos() {
 
   //Ingreso de datos y modificaciones a API
   const uploadImage = async () => {
+    setCargando(true)
+    setModalVisible(false)
     let id
     if (!image) return;
     const uri =
@@ -141,23 +143,29 @@ export default function AdmProductos() {
   };
 
   const EditarProducto = async () => {
+    setCargando(true)
+    setEdicionModalVisible(false)
     let urlEdicion = `${url}/${productosEdit.id}`
     try {
       const response = await axios.put(urlEdicion, { nombre: inputNombre, idCategoria: valorDrop, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock })
-      console.log(response.data)
+      console.log(await response.data)
       await fetchAllAxios()
+      FormatearInputs()
     } catch (error) {
       console.log(error)
     }
   }
 
   const InHabilitarCategoria = async () => {
+    setCargando(true)
+    setBorrarModalVisible(false)
     let urlInhabilitar = `${url}/${productosEdit.id}`
     console.log(urlInhabilitar)
     try {
       const response = await axios.put(urlInhabilitar, { estado: 0 })
-      console.log(response.data)
-      fetchAllAxios()
+      console.log(await response.data)
+      await fetchAllAxios()
+      FormatearInputs()
     } catch (error) {
       console.log(error)
     }
@@ -165,6 +173,7 @@ export default function AdmProductos() {
 
   const Metodos = async () => {
     await uploadImage()
+    FormatearInputs()
   }
 
   const FormatearInputs = () => {
@@ -214,7 +223,11 @@ export default function AdmProductos() {
 
   return (
     <View>
-      {cargando == true ? (<Text>Cargando</Text>) : (<View>
+      {cargando == true ? (<View>
+          <ActivityIndicator style={styles.activityIndicator} size="large" />
+        </View>) : 
+        (
+        <View>
         <FlatList
           style={styles.flatList}
           data={productosActivas}
@@ -275,7 +288,7 @@ export default function AdmProductos() {
                 mode="contained"
                 style={styles.buttonPaperModal}
                 onPress={() => {
-                  Metodos().then(FormatearInputs()).finally(setModalVisible(false));
+                  Metodos();
                 }}>
                 Confirmar
               </Button>
@@ -318,7 +331,7 @@ export default function AdmProductos() {
                 mode="contained"
                 style={styles.buttonPaperModal}
                 onPress={() => {
-                  EditarProducto().then(FormatearInputs()).finally(setEdicionModalVisible(false));
+                  EditarProducto();
                 }}>
                 Actualizar
               </Button>
@@ -341,7 +354,7 @@ export default function AdmProductos() {
                 mode="contained"
                 style={styles.buttonPaperModal}
                 onPress={() => {
-                  InHabilitarCategoria().then(FormatearInputs()).finally(setBorrarModalVisible(false));
+                  InHabilitarCategoria();
                 }}>
                 Sí
               </Button>
@@ -434,5 +447,9 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginTop: 8,
+  },
+  activityIndicator: {
+    marginTop: width.height/3,
+    
   }
 })

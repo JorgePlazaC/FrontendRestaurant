@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity,ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -67,31 +67,43 @@ export default function AdmMesas() {
 
   //Ingreso de datos y modificaciones a API
   const Confirmar = async () => {
+    setCargando(true)
+    setModalVisible(false)
     try {
       const response = await axios.post(url, { numMesa: inputMesas })
-      console.log(response.data)
+      console.log(await response.data)
+      await fetchAllAxios()
+      FormatearInputs()
     } catch (error) {
       console.log(error)
     }
   }
 
   const EditarCategoria = async () => {
+    setCargando(true)
+    setEdicionModalVisible(false)
     let urlEdicion = `${url}/${mesaEdit.id}`
     console.log(urlEdicion)
     try {
       const response = await axios.put(urlEdicion, { numMesa: inputMesas })
-      console.log(response.data)
+      console.log(await response.data)
+      await fetchAllAxios()
+      FormatearInputs()
     } catch (error) {
       console.log(error)
     }
   }
 
   const InHabilitarCategoria = async () => {
+    setCargando(true)
+    setBorrarModalVisible(false)
     let urlInhabilitar = `${url}/${mesaEdit.id}`
     console.log(urlInhabilitar)
     try {
       const response = await axios.put(urlInhabilitar, { estado: 0 })
-      console.log(response.data)
+      console.log(await response.data)
+      await fetchAllAxios()
+      FormatearInputs()
     } catch (error) {
       console.log(error)
     }
@@ -138,99 +150,107 @@ export default function AdmMesas() {
 
   return (
     <View>
-      <FlatList
-        style={styles.flatList}
-        data={mesasActivas}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
-      <Button
-        mode="contained"
-        style={styles.buttonPaper}
-        onPress={() => {
-          console.log(setModalVisible(true));
-        }}>
-        Agregar mesa
-      </Button>
-      <Button
-        mode="contained"
-        style={styles.buttonPaper}
-        onPress={() => {
-          navigation.navigate("mesasInactivas");
-        }}>
-        Ver mesas inactivas
-      </Button>
-      <Portal>
-        <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
-          <Dialog.Content>
-            <Text>Ingrese el número de la mesa</Text>
-            <TextInput placeholder='Número de mesa' onChangeText={(text) => inputMesas = text} />
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                Confirmar().then(fetchAllAxios()).then(FormatearInputs()).finally(setModalVisible(false));
-              }}>
-              Confirmar
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                setModalVisible(false);
-              }}>
-              Cancelar
-            </Button>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
-      <Portal>
-        <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
-          <Dialog.Content>
-            <Text>Cambiar número de mesa</Text>
-            <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false));
-              }}>
-              Actualizar
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                setEdicionModalVisible(false);
-              }}>
-              Cancelar
-            </Button>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
-      <Portal>
-        <Dialog visible={modalBorrarVisible} onDismiss={ocultarModalBorrar}>
-          <Dialog.Content>
-            <Text>¿Está seguro que desea deshabilitar la mesa?</Text>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                InHabilitarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setBorrarModalVisible(false));
-              }}>
-              Sí
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                setBorrarModalVisible(false);
-              }}>
-              Cancelar
-            </Button>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
+      {cargando ? (
+        <View>
+          <ActivityIndicator style={styles.activityIndicator} size="large" />
+        </View>
+      ) : (
+        <View>
+          <FlatList
+            style={styles.flatList}
+            data={mesasActivas}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+          />
+          <Button
+            mode="contained"
+            style={styles.buttonPaper}
+            onPress={() => {
+              console.log(setModalVisible(true));
+            }}>
+            Agregar mesa
+          </Button>
+          <Button
+            mode="contained"
+            style={styles.buttonPaper}
+            onPress={() => {
+              navigation.navigate("mesasInactivas");
+            }}>
+            Ver mesas inactivas
+          </Button>
+          <Portal>
+            <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
+              <Dialog.Content>
+                <Text>Ingrese el número de la mesa</Text>
+                <TextInput placeholder='Número de mesa' onChangeText={(text) => inputMesas = text} />
+                <Button
+                  mode="contained"
+                  style={styles.buttonPaperModal}
+                  onPress={() => {
+                    Confirmar();
+                  }}>
+                  Confirmar
+                </Button>
+                <Button
+                  mode="contained"
+                  style={styles.buttonPaperModal}
+                  onPress={() => {
+                    setModalVisible(false);
+                  }}>
+                  Cancelar
+                </Button>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
+          <Portal>
+            <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
+              <Dialog.Content>
+                <Text>Cambiar número de mesa</Text>
+                <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
+                <Button
+                  mode="contained"
+                  style={styles.buttonPaperModal}
+                  onPress={() => {
+                    EditarCategoria();
+                  }}>
+                  Actualizar
+                </Button>
+                <Button
+                  mode="contained"
+                  style={styles.buttonPaperModal}
+                  onPress={() => {
+                    setEdicionModalVisible(false);
+                  }}>
+                  Cancelar
+                </Button>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
+          <Portal>
+            <Dialog visible={modalBorrarVisible} onDismiss={ocultarModalBorrar}>
+              <Dialog.Content>
+                <Text>¿Está seguro que desea deshabilitar la mesa?</Text>
+                <Button
+                  mode="contained"
+                  style={styles.buttonPaperModal}
+                  onPress={() => {
+                    InHabilitarCategoria();
+                  }}>
+                  Sí
+                </Button>
+                <Button
+                  mode="contained"
+                  style={styles.buttonPaperModal}
+                  onPress={() => {
+                    setBorrarModalVisible(false);
+                  }}>
+                  Cancelar
+                </Button>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
+        </View>
+      )}
     </View>
   )
 }
@@ -298,4 +318,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
   },
+  activityIndicator: {
+    marginTop: width.height/3,
+    
+  }
 })
