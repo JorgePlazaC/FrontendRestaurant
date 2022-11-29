@@ -168,6 +168,7 @@ export default function AdmCategorias() {
 
             <Button
               mode="contained"
+              style={styles.buttonPaperModal}
               onPress={() => {
                 Confirmar().then(fetchAllAxios()).then(FormatearInputs()).finally(setModalVisible(false));
               }}>
@@ -175,6 +176,7 @@ export default function AdmCategorias() {
             </Button>
             <Button
               mode="contained"
+              style={styles.buttonPaperModal}
               onPress={() => {
                 setModalVisible(false);
               }}>
@@ -194,6 +196,7 @@ export default function AdmCategorias() {
             />
             <Button
               mode="contained"
+              style={styles.buttonPaperModal}
               onPress={() => {
                 EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false));
               }}>
@@ -201,6 +204,7 @@ export default function AdmCategorias() {
             </Button>
             <Button
               mode="contained"
+              style={styles.buttonPaperModal}
               onPress={() => {
                 setEdicionModalVisible(false);
               }}>
@@ -215,6 +219,7 @@ export default function AdmCategorias() {
             <Text>¿Está seguro que desea deshabilitar la categoria?</Text>
             <Button
               mode="contained"
+              style={styles.buttonPaperModal}
               onPress={() => {
                 InHabilitarCategoria().then(fetchAllAxios).finally(setBorrarModalVisible(false));
               }}>
@@ -222,6 +227,7 @@ export default function AdmCategorias() {
             </Button>
             <Button
               mode="contained"
+              style={styles.buttonPaperModal}
               onPress={() => {
                 setBorrarModalVisible(false);
               }}>
@@ -255,7 +261,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   button: {
-    backgroundColor: '#859a9b',
+    backgroundColor: '#58ACFA',
     borderRadius: 10,
     padding: 5,
     marginTop: 10,
@@ -284,6 +290,13 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginBottom:2,
     marginHorizontal: 30,
+    backgroundColor: '#58ACFA'
+  },
+  buttonPaperModal: {
+    marginTop:8,
+    marginBottom:0,
+    marginHorizontal: 30,
+    backgroundColor: '#58ACFA'
   },
   parent: {
     flex: 1,

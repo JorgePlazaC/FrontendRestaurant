@@ -16,7 +16,7 @@ export default function Menu({ navigation }) {
   const urlTodosProductos = `${baseUrl}/api/productos`
 
   //UseContext
-  const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext } = useContext(RestaurantContext)
 
   //UseState
   const [arrayProductos, setArrayProductos] = useState([])
@@ -59,11 +59,11 @@ export default function Menu({ navigation }) {
         console.log(response.data);
         arrayCategorias = response.data
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+        .catch(function (error) {
+          console.log(error);
+        });
 
-      
+
 
       arrayCategorias.forEach((categoriaNueva, index) => {
         let nombre = categoriaNueva.nombre
@@ -83,24 +83,24 @@ export default function Menu({ navigation }) {
           console.log(response);
           let cont = index
 
-        array[cont].data = response.data
+          array[cont].data = response.data
         })
-        .catch(function (error) {
-          console.log(error);
-        });
+          .catch(function (error) {
+            console.log(error);
+          });
       })
       setArrayProductos(array)
       setProductosContext(array)
       await axios.get(urlTodosProductos).then(function (response) {
         console.log(response);
         arrayTodosProductos = response.data
-      setProductos(arrayTodosProductos)
+        setProductos(arrayTodosProductos)
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+        .catch(function (error) {
+          console.log(error);
+        });
 
-      
+
 
       //setCargando(false)
       console.log(productosContext)
@@ -174,7 +174,7 @@ export default function Menu({ navigation }) {
 
     })
 
-    if(carro[0] === undefined){
+    if (carro[0] === undefined) {
       return
     }
 
@@ -262,30 +262,30 @@ export default function Menu({ navigation }) {
 
 
   return (
-    <SafeAreaView >
-      <View centerContent style={styles.viewBody}>
-        {cargando == true && productosContext[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>) :
-          (<View>
 
-            <SectionList
-              style={styles.sectionList}
-              sections={productosContext}
-              keyExtractor={(item, index) => item + index}
-              renderSectionHeader={({ section: { title } }) => (
-                <Text style={styles.header}>{title}</Text>
-              )}
-              renderItem={({ item }) => <Item title={item} />}
-              stickySectionHeadersEnabled
-            />
-            <Button
-              style={styles.button}
-              title="Siguiente"
-              onPress={() => { ConfirmarCarro() }}
-            />
+    <View centerContent style={styles.viewBody}>
+      {cargando == true && productosContext[0] != undefined ? (<View><Text>Cargando</Text><ActivityIndicator /></View>) :
+        (<View>
 
-          </View>)}
-      </View>
-    </SafeAreaView>
+          <SectionList
+            style={styles.sectionList}
+            sections={productosContext}
+            keyExtractor={(item, index) => item + index}
+            renderSectionHeader={({ section: { title } }) => (
+              <Text style={styles.header}>{title}</Text>
+            )}
+            renderItem={({ item }) => <Item title={item} />}
+            stickySectionHeadersEnabled
+          />
+          <Button
+            style={styles.button}
+            title="Siguiente"
+            onPress={() => { ConfirmarCarro() }}
+          />
+
+        </View>)}
+    </View>
+
   )
 }
 
@@ -329,6 +329,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   sectionList: {
+    backgroundColor: '#F2F2F2',
+    minHeight: width.height - 150,
     maxHeight: width.height - 150,
+  },
+  buttonPaper: {
+    marginTop: 3,
+    marginBottom: 2,
+    marginHorizontal: 30,
+    backgroundColor: '#58ACFA'
+  },
+  buttonPaperModal: {
+    marginTop: 8,
+    marginBottom: 0,
+    marginHorizontal: 30,
+    backgroundColor: '#58ACFA'
+  },
+  parent: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  divider: {
+    marginTop: 8,
   }
 })

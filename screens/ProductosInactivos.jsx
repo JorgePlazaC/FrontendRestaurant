@@ -126,18 +126,22 @@ export default function ProductosActivos() {
     }
 
     const Item = ({ title }) => (
-        <View style={styles.item}>
-            <Text style={styles.text}>{title.nombre}</Text>
+        <View style={styles.viewBody}>
+            <View style={styles.parent}>
+                <Image source={{ uri: title.urlImagen }}
+                    style={styles.image}
+                />
+                <Text style={styles.text}>{title.nombre}</Text>
 
-            <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
-                <Image style={styles.image} source={require("../src/images/editar.png")} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => { ModalHabilitar(title) }}>
-                <Image style={styles.image} source={require("../src/images/borrar.png")} />
-            </TouchableOpacity>
-            <Image source={{ uri: title.urlImagen }}
-                style={{ width: 200, height: 200, backgroundColor: '#859a9b' }}
-            />
+                <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
+                    <Image style={styles.icon} source={require("../src/images/editar.png")} />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => { ModalHabilitar(title) }}>
+                    <Image style={styles.icon} source={require("../src/images/borrar.png")} />
+                </TouchableOpacity>
+            </View>
+            <Divider bold={true} style={styles.divider} />
+
         </View>
     )
 
@@ -150,7 +154,7 @@ export default function ProductosActivos() {
 
     return (
         <View>
-            {cargando == true ? (<Text>Cargando</Text>) : (<View style={styles.viewBody}>
+            {cargando == true ? (<Text>Cargando</Text>) : (<View>
                 <FlatList
                     style={styles.flatList}
                     data={arrayProductosInactivas}
@@ -184,6 +188,7 @@ export default function ProductosActivos() {
                             <TextInput placeholder={productosEdit.stock.toString()} onChangeText={(text) => setInputStock(text)} />
                             <Button
                                 mode="contained"
+                                style={styles.buttonPaper}
                                 onPress={() => {
                                     EditarProducto().then(FormatearInputs()).finally(setEdicionModalVisible(false));
                                 }}>
@@ -191,6 +196,7 @@ export default function ProductosActivos() {
                             </Button>
                             <Button
                                 mode="contained"
+                                style={styles.buttonPaper}
                                 onPress={() => {
                                     setEdicionModalVisible(false);
                                 }}>
@@ -205,6 +211,7 @@ export default function ProductosActivos() {
                             <Text>¿Está seguro que desea habilitar la categoria?</Text>
                             <Button
                                 mode="contained"
+                                style={styles.buttonPaper}
                                 onPress={() => {
                                     HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false));
                                 }}>
@@ -212,6 +219,7 @@ export default function ProductosActivos() {
                             </Button>
                             <Button
                                 mode="contained"
+                                style={styles.buttonPaper}
                                 onPress={() => {
                                     setHabilitarModalVisible(false);
                                 }}>
@@ -237,16 +245,21 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
         borderRadius: 16,
         width: '80%',
-        backgroundColor: 'white',
+        backgroundColor: 'white'
+
     },
     text: {
-        flex: 0.6
+        flex: 0.6,
+        marginTop: 30,
+        marginLeft: 15,
+        fontSize: 20,
     },
     button: {
-        backgroundColor: '#859a9b',
+        backgroundColor: '#58ACFA',
         borderRadius: 10,
         padding: 5,
-        marginBottom: 10,
+        marginTop: 10,
+        marginBottom: 43,
         shadowColor: '#303838',
         shadowOffset: { width: 0, height: 5 },
         shadowRadius: 10,
@@ -259,11 +272,39 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse',
     },
     image: {
+        width: 100,
+        height: 100,
+        backgroundColor: '#859a9b',
+        marginTop: 8,
+        borderRadius: 20,
+    },
+    icon: {
         maxHeight: 20,
         maxWidth: 20,
         marginBottom: 20,
     },
     flatList: {
+        minHeight: width.height - 150,
         maxHeight: width.height - 150,
+    },
+    buttonPaper: {
+        marginTop: 3,
+        marginBottom: 2,
+        marginHorizontal: 30,
+        backgroundColor: '#58ACFA'
+    },
+    buttonPaperModal: {
+        marginTop: 8,
+        marginBottom: 0,
+        marginHorizontal: 30,
+        backgroundColor: '#58ACFA'
+    },
+    parent: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "space-around",
+    },
+    divider: {
+        marginTop: 8,
     }
 })
