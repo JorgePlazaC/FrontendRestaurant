@@ -1,10 +1,10 @@
-import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
 //import { TextInput } from 'react-native'
-import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
+import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -15,8 +15,8 @@ export default function AdmCategorias() {
   //Asignacion a constante de UseNavigation
   const navigation = useNavigation()
 
-   //UseContext
-   const { mesa, setMesa, carro, setCarro,carroAgregado,setCarroAgregado,imagenes,setImagenes,productosContext, setProductosContext,categoriasActivas, setCategoriasActivas } = useContext(RestaurantContext)
+  //UseContext
+  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext, categoriasActivas, setCategoriasActivas } = useContext(RestaurantContext)
 
   //Url usadas
   const baseUrl = 'http://10.0.2.2:8000'
@@ -112,15 +112,16 @@ export default function AdmCategorias() {
 
   const Item = ({ title }) => (
     <View style={styles.viewBody}>
-      <Divider />
-      <Text style={styles.text}>{title.nombre}</Text>
-      <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
-        <Image style={styles.image} source={require("../src/images/editar.png")} />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => { ModalBorrar(title) }}>
-        <Image style={styles.image} source={require("../src/images/borrar.png")} />
-      </TouchableOpacity>
-      <Divider />
+      <View style={styles.parent}>
+        <Text style={styles.text}>{title.nombre}</Text>
+        <TouchableOpacity style={styles.button} onPress={() => { ModalEdicion(title) }}>
+          <Image style={styles.image} source={require("../src/images/editar.png")} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => { ModalBorrar(title) }}>
+          <Image style={styles.image} source={require("../src/images/borrar.png")} />
+        </TouchableOpacity>
+      </View>
+      <Divider bold={true} />
     </View>
   )
 
@@ -140,15 +141,19 @@ export default function AdmCategorias() {
         keyExtractor={item => item.id}
       />
       <Button
-        style={styles.button}
-        title="Agregar categoria"
-        onPress={() => { console.log(setModalVisible(true)) }}
-      />
+        mode="contained"
+        onPress={() => {
+          console.log(setModalVisible(true));
+        }}>
+        Agregar categoria
+      </Button>
       <Button
-        style={styles.button}
-        title="Ver categorias inactivas"
-        onPress={() => { navigation.navigate("categoriasInactivas") }}
-      />
+        mode="contained"
+        onPress={() => {
+          navigation.navigate("categoriasInactivas");
+        }}>
+        Ver categorias inactivas
+      </Button>
       <Portal>
         <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
           <Dialog.Content>
@@ -160,55 +165,66 @@ export default function AdmCategorias() {
             />
 
             <Button
-              style={styles.button}
-              title="Confirmar"
-              onPress={() => { Confirmar().then(fetchAllAxios()).then(FormatearInputs()).finally(setModalVisible(false)) }}
-            />
+              mode="contained"
+              onPress={() => {
+                Confirmar().then(fetchAllAxios()).then(FormatearInputs()).finally(setModalVisible(false));
+              }}>
+              Confirmar
+            </Button>
             <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setModalVisible(false) }}
-            />
+              mode="contained"
+              onPress={() => {
+                setModalVisible(false);
+              }}>
+              Cancelar
+            </Button>
           </Dialog.Content>
         </Dialog>
       </Portal>
       <Portal>
         <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
           <Dialog.Content>
-            <Text>Ingrese el nombre de la categoria</Text>
-            <Text>Cambiar nombre</Text>
+            <Text>Ingrese el nuevo nombre de la categoria</Text>
             <TextInput
               placeholder='Nuevo nombre'
               mode='outlined'
               onChangeText={(text) => inputCategoria = text}
             />
             <Button
-              style={styles.button}
-              title="Actualizar"
-              onPress={() => { EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
-            />
+              mode="contained"
+              onPress={() => {
+                EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false));
+              }}>
+              Actualizar
+            </Button>
             <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setEdicionModalVisible(false) }}
-            />
+              mode="contained"
+              onPress={() => {
+                setEdicionModalVisible(false);
+              }}>
+              Cancelar
+            </Button>
           </Dialog.Content>
         </Dialog>
       </Portal>
       <Portal>
         <Dialog visible={modalBorrarVisible} onDismiss={ocultarModalBorrar}>
           <Dialog.Content>
-          <Text>¿Está seguro que desea deshabilitar la categoria?</Text>
+            <Text>¿Está seguro que desea deshabilitar la categoria?</Text>
             <Button
-              style={styles.button}
-              title="Sí"
-              onPress={() => { InHabilitarCategoria().then(fetchAllAxios).finally(setBorrarModalVisible(false)) }}
-            />
+              mode="contained"
+              onPress={() => {
+                InHabilitarCategoria().then(fetchAllAxios).finally(setBorrarModalVisible(false));
+              }}>
+              Sí
+            </Button>
             <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setBorrarModalVisible(false) }}
-            />
+              mode="contained"
+              onPress={() => {
+                setBorrarModalVisible(false);
+              }}>
+              Cancelar
+            </Button>
           </Dialog.Content>
         </Dialog>
       </Portal>
@@ -232,12 +248,15 @@ const styles = StyleSheet.create({
 
   },
   text: {
-    flex: 0.6
+    flex: 0.6,
+    marginTop: 15,
+    fontSize: 20,
   },
   button: {
     backgroundColor: '#859a9b',
     borderRadius: 10,
     padding: 5,
+    marginTop: 10,
     marginBottom: 10,
     shadowColor: '#303838',
     shadowOffset: { width: 0, height: 5 },
@@ -256,6 +275,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   flatList: {
+    minHeight: width.height - 150,
     maxHeight: width.height - 150,
-  }
+  },
+  buttonPaper: {
+    flex: 0.25,
+  },
+  parent: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
 })

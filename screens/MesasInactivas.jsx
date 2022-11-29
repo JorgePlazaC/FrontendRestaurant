@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 //import { TextInput } from 'react-native'
-import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
+import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -137,15 +137,19 @@ export default function MesasInactivas() {
             <Text>Cambiar número de mesa</Text>
             <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
             <Button
-              style={styles.button}
-              title="Actualizar"
-              onPress={() => { EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
-            />
+              mode="contained"
+              onPress={() => {
+                EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false));
+              }}>
+              Actualizar
+            </Button>
             <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setEdicionModalVisible(false) }}
-            />
+              mode="contained"
+              onPress={() => {
+                setEdicionModalVisible(false);
+              }}>
+              Cancelar
+            </Button>
           </Dialog.Content>
         </Dialog>
       </Portal>
@@ -154,15 +158,19 @@ export default function MesasInactivas() {
           <Dialog.Content>
             <Text>¿Está seguro que desea habilitar la mesa?</Text>
             <Button
-              style={styles.button}
-              title="Sí"
-              onPress={() => { HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false)) }}
-            />
+              mode="contained"
+              onPress={() => {
+                HabilitarCategoria().then(fetchAllAxios).finally(setHabilitarModalVisible(false));
+              }}>
+              Sí
+            </Button>
             <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setHabilitarModalVisible(false) }}
-            />
+              mode="contained"
+              onPress={() => {
+                setHabilitarModalVisible(false);
+              }}>
+              Cancelar
+            </Button>
           </Dialog.Content>
         </Dialog>
       </Portal>

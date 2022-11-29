@@ -1,11 +1,11 @@
-import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 //import { TextInput } from 'react-native'
-import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
+import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -142,30 +142,38 @@ export default function AdmMesas() {
         keyExtractor={item => item.id}
       />
       <Button
-        style={styles.button}
-        title="Agregar mesa"
-        onPress={() => { console.log(setModalVisible(true)) }}
-      />
+        mode="contained"
+        onPress={() => {
+          console.log(setModalVisible(true));
+        }}>
+        Agregar mesa
+      </Button>
       <Button
-        style={styles.button}
-        title="Ver mesas inactivas"
-        onPress={() => { navigation.navigate("mesasInactivas") }}
-      />
+        mode="contained"
+        onPress={() => {
+          navigation.navigate("mesasInactivas");
+        }}>
+        Ver mesas inactivas
+      </Button>
       <Portal>
         <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
           <Dialog.Content>
             <Text>Ingrese el número de la mesa</Text>
             <TextInput placeholder='Número de mesa' onChangeText={(text) => inputMesas = text} />
             <Button
-              style={styles.button}
-              title="Confirmar"
-              onPress={() => { Confirmar().then(fetchAllAxios()).then(FormatearInputs()).finally(setModalVisible(false)) }}
-            />
+              mode="contained"
+              onPress={() => {
+                Confirmar().then(fetchAllAxios()).then(FormatearInputs()).finally(setModalVisible(false));
+              }}>
+              Confirmar
+            </Button>
             <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setModalVisible(false) }}
-            />
+              mode="contained"
+              onPress={() => {
+                setModalVisible(false);
+              }}>
+              Cancelar
+            </Button>
           </Dialog.Content>
         </Dialog>
       </Portal>
@@ -175,15 +183,19 @@ export default function AdmMesas() {
             <Text>Cambiar número de mesa</Text>
             <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
             <Button
-              style={styles.button}
-              title="Actualizar"
-              onPress={() => { EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
-            />
+              mode="contained"
+              onPress={() => {
+                EditarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setEdicionModalVisible(false));
+              }}>
+              Actualizar
+            </Button>
             <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setEdicionModalVisible(false) }}
-            />
+              mode="contained"
+              onPress={() => {
+                setEdicionModalVisible(false);
+              }}>
+              Cancelar
+            </Button>
           </Dialog.Content>
         </Dialog>
       </Portal>
@@ -192,15 +204,19 @@ export default function AdmMesas() {
           <Dialog.Content>
             <Text>¿Está seguro que desea deshabilitar la mesa?</Text>
             <Button
-              style={styles.button}
-              title="Sí"
-              onPress={() => { InHabilitarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
-            />
+              mode="contained"
+              onPress={() => {
+                InHabilitarCategoria().then(fetchAllAxios()).then(FormatearInputs()).finally(setBorrarModalVisible(false));
+              }}>
+              Sí
+            </Button>
             <Button
-              style={styles.button}
-              title="Cancelar"
-              onPress={() => { setBorrarModalVisible(false) }}
-            />
+              mode="contained"
+              onPress={() => {
+                setBorrarModalVisible(false);
+              }}>
+              Cancelar
+            </Button>
           </Dialog.Content>
         </Dialog>
       </Portal>

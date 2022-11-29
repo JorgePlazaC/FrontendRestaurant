@@ -72,7 +72,7 @@ export default function Resumen({ navigation }) {
         style={styles.flatList}
         data={carro}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => item + index}
       />
       <Text>Total: {CalcTotal()}</Text>
       <Button

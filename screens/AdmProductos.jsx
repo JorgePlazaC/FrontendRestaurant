@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 //import { TextInput } from 'react-native'
-import { TextInput, Divider, Portal, Dialog } from 'react-native-paper';
+import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -220,15 +220,19 @@ export default function AdmProductos() {
           keyExtractor={item => item.id}
         />
         <Button
-          style={styles.button}
-          title="Agregar producto"
-          onPress={() => { console.log(setModalVisible(true)) }}
-        />
+          mode="contained"
+          onPress={() => {
+            console.log(setModalVisible(true));
+          }}>
+          Agregar producto
+        </Button>
         <Button
-          style={styles.button}
-          title="Ver productos inactivos"
-          onPress={() => { navigation.navigate("productosInactivas") }}
-        />
+          mode="contained"
+          onPress={() => {
+            navigation.navigate("productosInactivas");
+          }}>
+          Ver productos inactivos
+        </Button>
         <Portal>
           <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
             <Dialog.Content>
@@ -257,15 +261,19 @@ export default function AdmProductos() {
               <Button title="Seleccionar imagen" onPress={pickImage} />
               {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200 }} />}
               <Button
-                style={styles.button}
-                title="Confirmar"
-                onPress={() => { Metodos().then(FormatearInputs()).finally(setModalVisible(false)) }}
-              />
+                mode="contained"
+                onPress={() => {
+                  Metodos().then(FormatearInputs()).finally(setModalVisible(false));
+                }}>
+                Confirmar
+              </Button>
               <Button
-                style={styles.button}
-                title="Cancelar"
-                onPress={() => { setModalVisible(false) }}
-              />
+                mode="contained"
+                onPress={() => {
+                  setModalVisible(false);
+                }}>
+                Cancelar
+              </Button>
             </Dialog.Content>
           </Dialog>
         </Portal>
@@ -294,15 +302,19 @@ export default function AdmProductos() {
               <Text>Stock</Text>
               <TextInput placeholder={productosEdit.stock.toString()} onChangeText={(text) => setInputStock(text)} />
               <Button
-                style={styles.button}
-                title="Actualizar"
-                onPress={() => { EditarProducto().then(FormatearInputs()).finally(setEdicionModalVisible(false)) }}
-              />
+                mode="contained"
+                onPress={() => {
+                  EditarProducto().then(FormatearInputs()).finally(setEdicionModalVisible(false));
+                }}>
+                Actualizar
+              </Button>
               <Button
-                style={styles.button}
-                title="Cancelar"
-                onPress={() => { setEdicionModalVisible(false) }}
-              />
+                mode="contained"
+                onPress={() => {
+                  setEdicionModalVisible(false);
+                }}>
+                Cancelar
+              </Button>
             </Dialog.Content>
           </Dialog>
         </Portal>) : (<View></View>)}
@@ -311,15 +323,19 @@ export default function AdmProductos() {
             <Dialog.Content>
               <Text>¿Está seguro que desea deshabilitar el producto?</Text>
               <Button
-                style={styles.button}
-                title="Sí"
-                onPress={() => { InHabilitarCategoria().then(FormatearInputs()).finally(setBorrarModalVisible(false)) }}
-              />
+                mode="contained"
+                onPress={() => {
+                  InHabilitarCategoria().then(FormatearInputs()).finally(setBorrarModalVisible(false));
+                }}>
+                Sí
+              </Button>
               <Button
-                style={styles.button}
-                title="Cancelar"
-                onPress={() => { setBorrarModalVisible(false) }}
-              />
+                mode="contained"
+                onPress={() => {
+                  setBorrarModalVisible(false);
+                }}>
+                Cancelar
+              </Button>
             </Dialog.Content>
           </Dialog>
         </Portal>
