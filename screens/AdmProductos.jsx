@@ -188,6 +188,10 @@ export default function AdmProductos() {
   const ModalEdicion = (producto) => {
     setProductosEdit(producto)
     setValorDrop(producto.idCategoria)
+    setInputNombre(producto.nombre)
+    setInputDescripcion(producto.descripcion)
+    setInputPrecio(producto.precio.toString())
+    setInputStock(producto.stock.toString())
     setEdicionModalVisible(true)
   }
 
@@ -308,7 +312,7 @@ export default function AdmProductos() {
           <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
             <Dialog.Content>
               <Text>Nombre</Text>
-              <TextInput value={productosEdit.nombre} onChangeText={(text) => setInputNombre(text)} />
+              <TextInput value={inputNombre} onChangeText={(text) => setInputNombre(text)} />
               <DropDownPicker
                 schema={{
                   label: 'nombre',
@@ -323,11 +327,11 @@ export default function AdmProductos() {
                 setItems={setArrayCategorias}
               />
               <Text>Descripción</Text>
-              <TextInput value={productosEdit.descripcion} onChangeText={(text) => setInputDescripcion(text)} />
+              <TextInput value={inputDescripcion} onChangeText={(text) => setInputDescripcion(text)} />
               <Text>Precio</Text>
-              <TextInput value={productosEdit.precio.toString()} onChangeText={(text) => setInputPrecio(text)} />
+              <TextInput value={inputPrecio} onChangeText={(text) => setInputPrecio(text)} />
               <Text>Stock</Text>
-              <TextInput value={productosEdit.stock.toString()} onChangeText={(text) => setInputStock(text)} />
+              <TextInput value={inputStock} onChangeText={(text) => setInputStock(text)} />
               <Button
                 mode="contained"
                 style={styles.buttonPaperModal}
