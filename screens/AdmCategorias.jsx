@@ -142,6 +142,7 @@ export default function AdmCategorias() {
       />
       <Button
         mode="contained"
+        style={styles.buttonPaper}
         onPress={() => {
           console.log(setModalVisible(true));
         }}>
@@ -149,6 +150,7 @@ export default function AdmCategorias() {
       </Button>
       <Button
         mode="contained"
+        style={styles.buttonPaper}
         onPress={() => {
           navigation.navigate("categoriasInactivas");
         }}>
@@ -279,7 +281,9 @@ const styles = StyleSheet.create({
     maxHeight: width.height - 150,
   },
   buttonPaper: {
-    flex: 0.25,
+    marginTop: 3,
+    marginBottom:2,
+    marginHorizontal: 30,
   },
   parent: {
     flex: 1,
