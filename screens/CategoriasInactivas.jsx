@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity,ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 //import { TextInput } from 'react-native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
+import { Formik } from "formik";
+import * as yup from 'yup'
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -72,13 +74,14 @@ export default function CategoriasInactivas() {
       console.log(await response.data)
       setHabilitarModalVisible(false)
       await fetchAllAxios()
-      
+
     } catch (error) {
       console.log(error)
     }
   }
 
-  const EditarCategoria = async () => {
+  const EditarCategoria = async (valores) => {
+    inputCategoria = valores.categoria
     setCargando(true)
     setEdicionModalVisible(false)
     let urlEdicion = `${url}/${categoriaEdit.id}`
@@ -108,6 +111,13 @@ export default function CategoriasInactivas() {
     setCategoriaEdit(categoria)
     setHabilitarModalVisible(true)
   }
+
+  //Validaciones
+  const categoriaValidationSchema = yup.object().shape({
+    categoria: yup
+      .string()
+      .required('El campo categoria es requerido.'),
+  })
 
   const Item = ({ title }) => (
     <View style={styles.viewBody}>
@@ -145,29 +155,42 @@ export default function CategoriasInactivas() {
         <Portal>
           <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
             <Dialog.Content>
-              <Text>Ingrese el nombre de la categoria</Text>
-              <Text>Cambiar nombre</Text>
-              <TextInput
-                placeholder='Nuevo nombre'
-                mode='outlined'
-                onChangeText={(text) => inputCategoria = text}
-              />
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  EditarCategoria();
-                }}>
-                Actualizar
-              </Button>
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  setEdicionModalVisible(false);
-                }}>
-                Cancelar
-              </Button>
+              <Formik
+                initialValues={{ email: '' }}
+                validationSchema={categoriaValidationSchema}
+                onSubmit={(values) => { EditarCategoria(values) }}>
+                {({
+                  handleSubmit, errors, handleChange, touched, setFieldTouched, isValid, values
+                }) => (
+                  <View>
+                    <Text>Ingrese el nuevo nombre de la categoria</Text>
+                    <TextInput
+                      placeholder='Nuevo nombre'
+                      mode='outlined'
+                      onChangeText={handleChange('categoria')}
+                      onBlur={() => setFieldTouched('categoria')}
+                    />
+                    <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.categoria}</Text>
+                    <Button
+                      mode="contained"
+                      style={styles.buttonPaperModal}
+                      disabled={!isValid}
+                      onPress={
+                        handleSubmit
+                      }>
+                      Actualizar
+                    </Button>
+                    <Button
+                      mode="contained"
+                      style={styles.buttonPaperModal}
+                      onPress={() => {
+                        setEdicionModalVisible(false);
+                      }}>
+                      Cancelar
+                    </Button>
+                  </View>
+                )}
+              </Formik>
             </Dialog.Content>
           </Dialog>
         </Portal>
@@ -263,7 +286,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   activityIndicator: {
-    marginTop: width.height/3,
-    
+    marginTop: width.height / 3,
+
   }
 })

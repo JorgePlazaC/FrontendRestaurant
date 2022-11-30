@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity,ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { SafeAreaView } from 'react-native-safe-area-context'
 //import { TextInput } from 'react-native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
+import { Formik } from "formik";
+import * as yup from 'yup'
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -63,7 +65,8 @@ export default function AdmCategorias() {
   }
 
   //Ingreso de datos y modificaciones a API
-  const Confirmar = async () => {
+  const Confirmar = async (valores) => {
+    inputCategoria = valores.categoria
     setCargando(true)
     setModalVisible(false)
     try {
@@ -76,7 +79,8 @@ export default function AdmCategorias() {
     }
   }
 
-  const EditarCategoria = async () => {
+  const EditarCategoria = async (valores) => {
+    inputCategoria = valores.categoria
     setCargando(true)
     setEdicionModalVisible(false)
     let urlEdicion = `${url}/${categoriaEdit.id}`
@@ -120,6 +124,13 @@ export default function AdmCategorias() {
     setCategoriaEdit(categoria)
     setBorrarModalVisible(true)
   }
+
+  //Validaciones
+  const categoriaValidationSchema = yup.object().shape({
+    categoria: yup
+      .string()
+      .required('El campo categoria es requerido.'),
+  })
 
   const Item = ({ title }) => (
     <View style={styles.viewBody}>
@@ -178,56 +189,85 @@ export default function AdmCategorias() {
             <Portal>
               <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
                 <Dialog.Content>
-                  <Text>Ingrese el nombre de la categoria</Text>
-                  <TextInput
-                    placeholder='Nombre categoria'
-                    mode='outlined'
-                    onChangeText={text => inputCategoria = text}
-                  />
-                  <Button
-                    mode="contained"
-                    style={styles.buttonPaperModal}
-                    onPress={() => {
-                      Confirmar();
-                    }}>
-                    Confirmar
-                  </Button>
-                  <Button
-                    mode="contained"
-                    style={styles.buttonPaperModal}
-                    onPress={() => {
-                      setModalVisible(false);
-                    }}>
-                    Cancelar
-                  </Button>
+                  <Formik
+                    initialValues={{ email: '' }}
+                    validationSchema={categoriaValidationSchema}
+                    onSubmit={(values) => { Confirmar(values) }}>
+                    {({
+                      handleSubmit, errors, handleChange, touched, setFieldTouched, isValid, values
+                    }) => (
+                      <View>
+                        <Text>Ingrese el nombre de la categoria</Text>
+                        <TextInput
+                          value={values.categoria}
+                          placeholder='Nombre categoria'
+                          mode='outlined'
+                          onChangeText={handleChange('categoria')}
+                          onBlur={() => setFieldTouched('categoria')}
+                        />
+                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.categoria}</Text>
+                        <Button
+                          mode="contained"
+                          style={styles.buttonPaperModal}
+                          disabled={!isValid}
+                          onPress={
+                            handleSubmit
+                          }>
+                          Confirmar
+                        </Button>
+                        <Button
+                          mode="contained"
+                          style={styles.buttonPaperModal}
+                          onPress={() => {
+                            setModalVisible(false);
+                          }}>
+                          Cancelar
+                        </Button>
+                      </View>
+                    )}
+                  </Formik>
                 </Dialog.Content>
               </Dialog>
             </Portal>
             <Portal>
               <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
                 <Dialog.Content>
-                  <Text>Ingrese el nuevo nombre de la categoria</Text>
-                  <TextInput
-                    placeholder='Nuevo nombre'
-                    mode='outlined'
-                    onChangeText={(text) => inputCategoria = text}
-                  />
-                  <Button
-                    mode="contained"
-                    style={styles.buttonPaperModal}
-                    onPress={() => {
-                      EditarCategoria();
-                    }}>
-                    Actualizar
-                  </Button>
-                  <Button
-                    mode="contained"
-                    style={styles.buttonPaperModal}
-                    onPress={() => {
-                      setEdicionModalVisible(false);
-                    }}>
-                    Cancelar
-                  </Button>
+                  <Formik
+                    initialValues={{ email: '' }}
+                    validationSchema={categoriaValidationSchema}
+                    onSubmit={(values) => { EditarCategoria(values) }}>
+                    {({
+                      handleSubmit, errors, handleChange, touched, setFieldTouched, isValid, values
+                    }) => (
+                      <View>
+                        <Text>Ingrese el nuevo nombre de la categoria</Text>
+                        <TextInput
+                          placeholder='Nuevo nombre'
+                          mode='outlined'
+                          onChangeText={handleChange('categoria')}
+                          onBlur={() => setFieldTouched('categoria')}
+                        />
+                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.categoria}</Text>
+                        <Button
+                          mode="contained"
+                          style={styles.buttonPaperModal}
+                          disabled={!isValid}
+                          onPress={
+                            handleSubmit
+                          }>
+                          Actualizar
+                        </Button>
+                        <Button
+                          mode="contained"
+                          style={styles.buttonPaperModal}
+                          onPress={() => {
+                            setEdicionModalVisible(false);
+                          }}>
+                          Cancelar
+                        </Button>
+                      </View>
+                    )}
+                  </Formik>
                 </Dialog.Content>
               </Dialog>
             </Portal>
@@ -324,7 +364,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   activityIndicator: {
-    marginTop: width.height/3,
-    
+    marginTop: width.height / 3,
+
   }
 })
