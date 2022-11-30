@@ -68,7 +68,7 @@ export default function Mesas() {
           <DropDownPicker
             schema={{
               label: 'numMesa',
-              value: 'numMesa'
+              value: 'id'
             }}
             placeholder="Seleccione su mesa"
             open={abrirDrop}
