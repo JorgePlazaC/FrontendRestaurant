@@ -261,11 +261,10 @@ export default function Menu({ navigation }) {
         <View style={styles.parent}>
           <Image source={{ uri: title.urlImagen }}
             style={styles.imageMenu} />
-          <View>
+          <View style={styles.viewContenedor}>
             <Text style={styles.textSection}>{title.nombre}</Text>
             <Text style={styles.textPrecio}>Precio: {title.precio}</Text>
           </View>
-          <Text style={styles.textCont}>                                          </Text>
         </View>
         <Divider bold={true} />
       </TouchableOpacity>
@@ -348,9 +347,7 @@ export default function Menu({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     display: "flex",
-    flexDirection: 'row',
     flexGrow: 0,
-
   },
   viewBody: {
     marginHorizontal: 30,
@@ -371,9 +368,11 @@ const styles = StyleSheet.create({
     fontSize: 24
   },
   textSection: {
-    marginTop: 30,
+    
+    marginTop: 20,
     marginLeft: 20,
     fontSize: 20,
+    alignSelf: 'flex-start'
   },
   textPrecio: {
     marginTop: 10,
@@ -426,10 +425,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   imageMenu: {
-
+    
     marginTop: 10,
     marginBottom: 10,
-    marginLeft: 15,
+    marginLeft: 8,
     width: 100,
     height: 100,
     backgroundColor: '#859a9b',
@@ -450,5 +449,15 @@ const styles = StyleSheet.create({
   activityIndicator: {
     marginTop: width.height/3,
     
+  },
+  textRelleno: {
+    flex:0.2,
+    alignSelf: 'flex-end',
+  },
+  touchable: {
+    flex:1
+  },
+  viewContenedor: {
+    flex: 1,
   }
 })
