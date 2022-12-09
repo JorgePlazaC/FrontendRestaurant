@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity,ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -13,6 +13,7 @@ import * as yup from 'yup'
 
 import RestaurantContext from '../src/components/RestaurantContext'
 import CategoriasInactivas from './CategoriasInactivas'
+import { ScrollView } from 'react-native-gesture-handler'
 
 const width = Dimensions.get('window')
 
@@ -55,6 +56,8 @@ export default function AdmProductos() {
   const [inputPrecio, setInputPrecio] = useState()
   const [inputStock, setInputStock] = useState()
   const [subiendoImagen, setSubiendoImagen] = useState(false)
+  const [mensajeDrop, setMensajeDrop] = useState()
+  const [mensajeImagen, setMensajeImagen] = useState()
 
   const cantFetch = 0
 
@@ -76,7 +79,7 @@ export default function AdmProductos() {
       urlCategoriasInactivas,
     ];
     try {
-      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }, {data: categoriasInactivos}]) => {
+      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }, { data: categoriasInactivos }]) => {
         setArrayProductos(await productos)
         setProductosActivas(await prodActivos)
         setArrayProductosInactivas(await prodInactivos)
@@ -97,16 +100,25 @@ export default function AdmProductos() {
       aspect: [4, 3],
       quality: 1,
     });
+    
 
     if (!result.canceled) {
       setImage(result);
+      setMensajeImagen(undefined)
     }
   };
 
   //Ingreso de datos y modificaciones a API
-  const uploadImage = async () => {
+  const uploadImage = async (valores) => {
     setCargando(true)
     setModalVisible(false)
+
+    console.log(inputNombre)
+    console.log(inputDescripcion)
+    console.log(inputPrecio)
+    console.log(inputStock)
+    console.log(image)
+    console.log(valores)
     let id
     if (!image) return;
     const uri =
@@ -130,7 +142,7 @@ export default function AdmProductos() {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      const response = await axios.post(url, { nombre: inputNombre, idCategoria: valorDrop, idImagen: await data.data.id, urlImagen: await data.data.url, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock, cant: cantFetch })
+      const response = await axios.post(url, { nombre: valores.nombre, idCategoria: valorDrop, idImagen: await data.data.id, urlImagen: await data.data.url, descripcion: valores.descripcion, precio: parseInt(valores.precio), stock: parseInt(valores.stock), cant: cantFetch })
       setSubiendoImagen(false)
       await fetchAllAxios()
 
@@ -178,14 +190,17 @@ export default function AdmProductos() {
     }
   }
 
-  const Metodos = async () => {
-    await uploadImage()
-    FormatearInputs()
+  const Metodos = async (valores) => {
+    if (!ValidarCategoria() && !ValidarImagen()) {
+      await uploadImage(valores)
+      FormatearInputs()
+    }
+
   }
 
   const FormatearInputs = () => {
     setInputNombre("")
-    setValorDrop("")
+    setValorDrop(undefined)
     setInputDescripcion("")
     setInputPrecio("")
     setInputStock("")
@@ -207,10 +222,52 @@ export default function AdmProductos() {
     setBorrarModalVisible(true)
   }
 
+  //Validaciones
+  const productosValidationSchema = yup.object().shape({
+    nombre: yup
+      .string()
+      .max(30, 'No puede haber mas de 30 digitos')
+      .required('El campo nombre es requerido.'),
+    descripcion: yup
+      .string()
+      .max(30, 'No puede haber mas de 30 digitos')
+      .required('El campo descripción es requerido.'),
+    precio: yup
+      .string()
+      .matches(/^\d*$/, 'El precio tiene que ser un valor numerico')
+      .max(8, 'El precio no puede tener mas de 8 digitos')
+      .required('El campo precio es requerido.'),
+    stock: yup
+      .string()
+      .matches(/^\d*$/, 'El stock tiene que ser un valor numerico')
+      .max(8, 'El stock no puede tener mas de 8 digitos')
+      .required('El campo stock es requerido.'),
+  })
+
+  const ValidarCategoria = () => {
+    if (valorDrop == undefined || valorDrop == null) {
+      setMensajeDrop('Ingrese una categoria')
+      return true
+    } else {
+      setMensajeDrop(undefined)
+      return false
+    }
+  }
+
+  const ValidarImagen = () => {
+    if (image == undefined || image == null) {
+      setMensajeImagen('Ingrese una imagen')
+      return true
+    } else {
+      setMensajeImagen(undefined)
+      return false
+    }
+  }
+
   const Item = ({ title }) => (
     <View style={styles.viewBody}>
       <View style={styles.parent}>
-      <Image source={{ uri: title.urlImagen }}
+        <Image source={{ uri: title.urlImagen }}
           style={styles.image}
         />
         <Text style={styles.text}>{title.nombre}</Text>
@@ -236,152 +293,185 @@ export default function AdmProductos() {
   return (
     <View>
       {cargando == true ? (<View>
-          <ActivityIndicator style={styles.activityIndicator} size="large" />
-        </View>) : 
+        <ActivityIndicator style={styles.activityIndicator} size="large" />
+      </View>) :
         (
-        <View>
-        <FlatList
-          style={styles.flatList}
-          data={productosActivas}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-        />
-        <Button
-          mode="contained"
-          style={styles.buttonPaper}
-          onPress={() => {
-            console.log(setModalVisible(true));
-          }}>
-          Agregar producto
-        </Button>
-        <Button
-          mode="contained"
-          style={styles.buttonPaper}
-          onPress={() => {
-            navigation.navigate("productosInactivas");
-          }}>
-          Ver productos inactivos
-        </Button>
-        <Portal>
-          <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
-            <Dialog.Content>
-              <Text>Ingrese el nombre</Text>
-              <TextInput placeholder='Nombre' onChangeText={(text) => setInputNombre(text)} />
-              <Text>Elija una categoria</Text>
-              <DropDownPicker
-                schema={{
-                  label: 'nombre',
-                  value: 'id'
-                }}
-                placeholder="Seleccione una categoria"
-                open={abrirDrop}
-                value={valorDrop}
-                items={arrayCategoriasActivas}
-                setOpen={setAbrirDrop}
-                setValue={setValorDrop}
-                setItems={setArrayCategorias}
-              />
-              <Text>Ingrese la descripción</Text>
-              <TextInput placeholder='Descripción' onChangeText={(text) => setInputDescripcion(text)} />
-              <Text>Ingrese el precio</Text>
-              <TextInput placeholder='Precio' onChangeText={(text) => setInputPrecio(text)} />
-              <Text>Ingrese el stock</Text>
-              <TextInput placeholder='Stock' onChangeText={(text) => setInputStock(text)} />
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  pickImage();
-                }}>
-                Seleccionar imagen
-              </Button>
-              {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200 }} />}
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  Metodos();
-                }}>
-                Confirmar
-              </Button>
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  setModalVisible(false);
-                }}>
-                Cancelar
-              </Button>
-            </Dialog.Content>
-          </Dialog>
-        </Portal>
-        {modalEdicionVisible ? (<Portal>
-          <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
-            <Dialog.Content>
-              <Text>Nombre</Text>
-              <TextInput value={inputNombre} onChangeText={(text) => setInputNombre(text)} />
-              <DropDownPicker
-                schema={{
-                  label: 'nombre',
-                  value: 'id'
-                }}
-                placeholder="Seleccione una categoria"
-                open={abrirDrop}
-                value={valorDrop}
-                items={arrayCategoriasActivas}
-                setOpen={setAbrirDrop}
-                setValue={setValorDrop}
-                setItems={setArrayCategorias}
-              />
-              <Text>Descripción</Text>
-              <TextInput value={inputDescripcion} onChangeText={(text) => setInputDescripcion(text)} />
-              <Text>Precio</Text>
-              <TextInput value={inputPrecio} onChangeText={(text) => setInputPrecio(text)} />
-              <Text>Stock</Text>
-              <TextInput value={inputStock} onChangeText={(text) => setInputStock(text)} />
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  EditarProducto();
-                }}>
-                Actualizar
-              </Button>
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  setEdicionModalVisible(false);
-                }}>
-                Cancelar
-              </Button>
-            </Dialog.Content>
-          </Dialog>
-        </Portal>) : (<View></View>)}
-        <Portal>
-          <Dialog visible={modalBorrarVisible} onDismiss={ocultarModalBorrar}>
-            <Dialog.Content>
-              <Text>¿Está seguro que desea deshabilitar el producto?</Text>
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  InHabilitarCategoria();
-                }}>
-                Sí
-              </Button>
-              <Button
-                mode="contained"
-                style={styles.buttonPaperModal}
-                onPress={() => {
-                  setBorrarModalVisible(false);
-                }}>
-                Cancelar
-              </Button>
-            </Dialog.Content>
-          </Dialog>
-        </Portal>
-      </View>)}
+          <View>
+            <FlatList
+              style={styles.flatList}
+              data={productosActivas}
+              renderItem={renderItem}
+              keyExtractor={item => item.id}
+            />
+            <Button
+              mode="contained"
+              style={styles.buttonPaper}
+              onPress={() => {
+                console.log(setModalVisible(true));
+              }}>
+              Agregar producto
+            </Button>
+            <Button
+              mode="contained"
+              style={styles.buttonPaper}
+              onPress={() => {
+                navigation.navigate("productosInactivas");
+              }}>
+              Ver productos inactivos
+            </Button>
+            <Portal>
+              <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
+                <Dialog.Content>
+                  <Formik
+                    initialValues={{ nombre: '', descripcion: '', }}
+                    validationSchema={productosValidationSchema}
+                    onSubmit={(values) => { Metodos(values) }}>
+                    {({
+                      handleSubmit, errors, handleChange, touched, setFieldTouched, isValid, values
+                    }) => (
+                      <View>
+                        <ScrollView>
+                        <Text>Ingrese el nombre</Text>
+                        <TextInput placeholder='Nombre'
+                          onChangeText={handleChange('nombre')}
+                          onBlur={() => setFieldTouched('nombre')} />
+                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.nombre}</Text>
+                        <Text>Elija una categoria</Text>
+                        <DropDownPicker
+                          schema={{
+                            label: 'nombre',
+                            value: 'id'
+                          }}
+                          placeholder="Seleccione una categoria"
+                          open={abrirDrop}
+                          value={valorDrop}
+                          items={arrayCategoriasActivas}
+                          setOpen={setAbrirDrop}
+                          setValue={setValorDrop}
+                          setItems={setArrayCategorias}
+                          onChangeValue={(value) => {
+                            ValidarCategoria()
+                          }}
+                        />
+                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeDrop}</Text>
+                        <Text>Ingrese la descripción</Text>
+                        <TextInput
+                          placeholder='Descripción'
+                          onChangeText={handleChange('descripcion')}
+                          onBlur={() => setFieldTouched('descripcion')} />
+                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.descripcion}</Text>
+                        <Text>Ingrese el precio</Text>
+                        <TextInput
+                          placeholder='Precio'
+                          onChangeText={handleChange('precio')}
+                          onBlur={() => setFieldTouched('precio')} />
+                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.precio}</Text>
+                        <Text>Ingrese el stock</Text>
+                        <TextInput
+                          placeholder='Stock'
+                          onChangeText={handleChange('stock')}
+                          onBlur={() => setFieldTouched('stock')} />
+                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.stock}</Text>
+                        <Button
+                          mode="contained"
+                          style={styles.buttonPaperModal}
+                          onPress={() => {
+                            pickImage();
+                          }}>
+                          Seleccionar imagen
+                        </Button>
+                        {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200 }} />}
+                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeImagen}</Text>
+                        <Button
+                          mode="contained"
+                          style={styles.buttonPaperModal}
+                          onPress={
+                            handleSubmit
+                          }>
+                          Confirmar
+                        </Button>
+                        <Button
+                          mode="contained"
+                          style={styles.buttonPaperModal}
+                          onPress={() => {
+                            setModalVisible(false);
+                          }}>
+                          Cancelar
+                        </Button>
+                        </ScrollView>
+                      </View>
+                    )}
+                  </Formik>
+                </Dialog.Content>
+              </Dialog>
+            </Portal>
+            {modalEdicionVisible ? (<Portal>
+              <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
+                <Dialog.Content>
+                  <Text>Nombre</Text>
+                  <TextInput value={inputNombre} onChangeText={(text) => setInputNombre(text)} />
+                  <DropDownPicker
+                    schema={{
+                      label: 'nombre',
+                      value: 'id'
+                    }}
+                    placeholder="Seleccione una categoria"
+                    open={abrirDrop}
+                    value={valorDrop}
+                    items={arrayCategoriasActivas}
+                    setOpen={setAbrirDrop}
+                    setValue={setValorDrop}
+                    setItems={setArrayCategorias}
+                  />
+                  <Text>Descripción</Text>
+                  <TextInput value={inputDescripcion} onChangeText={(text) => setInputDescripcion(text)} />
+                  <Text>Precio</Text>
+                  <TextInput value={inputPrecio} onChangeText={(text) => setInputPrecio(text)} />
+                  <Text>Stock</Text>
+                  <TextInput value={inputStock} onChangeText={(text) => setInputStock(text)} />
+                  <Button
+                    mode="contained"
+                    style={styles.buttonPaperModal}
+                    onPress={() => {
+                      EditarProducto();
+                    }}>
+                    Actualizar
+                  </Button>
+                  <Button
+                    mode="contained"
+                    style={styles.buttonPaperModal}
+                    onPress={() => {
+                      setEdicionModalVisible(false);
+                    }}>
+                    Cancelar
+                  </Button>
+                </Dialog.Content>
+              </Dialog>
+            </Portal>) : (<View></View>)}
+            <Portal>
+              <Dialog visible={modalBorrarVisible} onDismiss={ocultarModalBorrar}>
+                <Dialog.Content>
+                  <Text>¿Está seguro que desea deshabilitar el producto?</Text>
+                  <Button
+                    mode="contained"
+                    style={styles.buttonPaperModal}
+                    onPress={() => {
+                      InHabilitarCategoria();
+                    }}>
+                    Sí
+                  </Button>
+                  <Button
+                    mode="contained"
+                    style={styles.buttonPaperModal}
+                    onPress={() => {
+                      setBorrarModalVisible(false);
+                    }}>
+                    Cancelar
+                  </Button>
+                </Dialog.Content>
+              </Dialog>
+            </Portal>
+          </View>)}
     </View>
   )
 }
@@ -412,7 +502,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 5,
     marginTop: 10,
-    marginBottom:43,
+    marginBottom: 43,
     shadowColor: '#303838',
     shadowOffset: { width: 0, height: 5 },
     shadowRadius: 10,
@@ -425,8 +515,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
   },
   image: {
-    width: 100, 
-    height: 100, 
+    width: 100,
+    height: 100,
     backgroundColor: '#859a9b',
     marginTop: 8,
     borderRadius: 20,
@@ -461,7 +551,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   activityIndicator: {
-    marginTop: width.height/3,
-    
+    marginTop: width.height / 3,
+
   }
 })
