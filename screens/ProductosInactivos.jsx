@@ -10,6 +10,7 @@ import { Modal } from 'react-native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
 
 import RestaurantContext from '../src/components/RestaurantContext'
+import { ScrollView } from 'react-native-gesture-handler'
 
 const width = Dimensions.get('window')
 
@@ -173,43 +174,45 @@ export default function ProductosActivos() {
                 {modalEdicionVisible ? (<Portal>
                     <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
                         <Dialog.Content>
-                            <Text>Nombre</Text>
-                            <TextInput value={productosEdit.nombre} onChangeText={(text) => setInputNombre(text)} />
-                            <DropDownPicker
-                                schema={{
-                                    label: 'nombre',
-                                    value: 'id'
-                                }}
-                                placeholder="Seleccione una categoria"
-                                open={abrirDrop}
-                                value={valorDrop}
-                                items={arrayCategorias}
-                                setOpen={setAbrirDrop}
-                                setValue={setValorDrop}
-                                setItems={setArrayCategorias}
-                            />
-                            <Text>Descripción</Text>
-                            <TextInput value={productosEdit.descripcion} onChangeText={(text) => setInputDescripcion(text)} />
-                            <Text>Precio</Text>
-                            <TextInput value={productosEdit.precio.toString()} onChangeText={(text) => setInputPrecio(text)} />
-                            <Text>Stock</Text>
-                            <TextInput value={productosEdit.stock.toString()} onChangeText={(text) => setInputStock(text)} />
-                            <Button
-                                mode="contained"
-                                style={styles.buttonPaper}
-                                onPress={() => {
-                                    EditarProducto();
-                                }}>
-                                Actualizar
-                            </Button>
-                            <Button
-                                mode="contained"
-                                style={styles.buttonPaper}
-                                onPress={() => {
-                                    setEdicionModalVisible(false);
-                                }}>
-                                Cancelar
-                            </Button>
+                            <ScrollView>
+                                <Text>Nombre</Text>
+                                <TextInput value={productosEdit.nombre} onChangeText={(text) => setInputNombre(text)} />
+                                <DropDownPicker
+                                    schema={{
+                                        label: 'nombre',
+                                        value: 'id'
+                                    }}
+                                    placeholder="Seleccione una categoria"
+                                    open={abrirDrop}
+                                    value={valorDrop}
+                                    items={arrayCategorias}
+                                    setOpen={setAbrirDrop}
+                                    setValue={setValorDrop}
+                                    setItems={setArrayCategorias}
+                                />
+                                <Text>Descripción</Text>
+                                <TextInput value={productosEdit.descripcion} onChangeText={(text) => setInputDescripcion(text)} />
+                                <Text>Precio</Text>
+                                <TextInput value={productosEdit.precio.toString()} onChangeText={(text) => setInputPrecio(text)} />
+                                <Text>Stock</Text>
+                                <TextInput value={productosEdit.stock.toString()} onChangeText={(text) => setInputStock(text)} />
+                                <Button
+                                    mode="contained"
+                                    style={styles.buttonPaper}
+                                    onPress={() => {
+                                        EditarProducto();
+                                    }}>
+                                    Actualizar
+                                </Button>
+                                <Button
+                                    mode="contained"
+                                    style={styles.buttonPaper}
+                                    onPress={() => {
+                                        setEdicionModalVisible(false);
+                                    }}>
+                                    Cancelar
+                                </Button>
+                            </ScrollView>
                         </Dialog.Content>
                     </Dialog>
                 </Portal>) : (<View></View>)}

@@ -100,7 +100,7 @@ export default function AdmProductos() {
       aspect: [4, 3],
       quality: 1,
     });
-    
+
 
     if (!result.canceled) {
       setImage(result);
@@ -331,73 +331,75 @@ export default function AdmProductos() {
                     }) => (
                       <View>
                         <ScrollView>
-                        <Text>Ingrese el nombre</Text>
-                        <TextInput placeholder='Nombre'
-                          onChangeText={handleChange('nombre')}
-                          onBlur={() => setFieldTouched('nombre')} />
-                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.nombre}</Text>
-                        <Text>Elija una categoria</Text>
-                        <DropDownPicker
-                          schema={{
-                            label: 'nombre',
-                            value: 'id'
-                          }}
-                          placeholder="Seleccione una categoria"
-                          open={abrirDrop}
-                          value={valorDrop}
-                          items={arrayCategoriasActivas}
-                          setOpen={setAbrirDrop}
-                          setValue={setValorDrop}
-                          setItems={setArrayCategorias}
-                          onChangeValue={(value) => {
-                            ValidarCategoria()
-                          }}
-                        />
-                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeDrop}</Text>
-                        <Text>Ingrese la descripción</Text>
-                        <TextInput
-                          placeholder='Descripción'
-                          onChangeText={handleChange('descripcion')}
-                          onBlur={() => setFieldTouched('descripcion')} />
-                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.descripcion}</Text>
-                        <Text>Ingrese el precio</Text>
-                        <TextInput
-                          placeholder='Precio'
-                          onChangeText={handleChange('precio')}
-                          onBlur={() => setFieldTouched('precio')} />
-                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.precio}</Text>
-                        <Text>Ingrese el stock</Text>
-                        <TextInput
-                          placeholder='Stock'
-                          onChangeText={handleChange('stock')}
-                          onBlur={() => setFieldTouched('stock')} />
-                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.stock}</Text>
-                        <Button
-                          mode="contained"
-                          style={styles.buttonPaperModal}
-                          onPress={() => {
-                            pickImage();
-                          }}>
-                          Seleccionar imagen
-                        </Button>
-                        {image && <Image source={{ uri: image.uri }} style={{ width: 200, height: 200 }} />}
-                        <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeImagen}</Text>
-                        <Button
-                          mode="contained"
-                          style={styles.buttonPaperModal}
-                          onPress={
-                            handleSubmit
-                          }>
-                          Confirmar
-                        </Button>
-                        <Button
-                          mode="contained"
-                          style={styles.buttonPaperModal}
-                          onPress={() => {
-                            setModalVisible(false);
-                          }}>
-                          Cancelar
-                        </Button>
+                          <Text>Ingrese el nombre</Text>
+                          <TextInput placeholder='Nombre'
+                            onChangeText={handleChange('nombre')}
+                            onBlur={() => setFieldTouched('nombre')} />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.nombre}</Text>
+                          <Text>Elija una categoria</Text>
+                          <DropDownPicker
+                            schema={{
+                              label: 'nombre',
+                              value: 'id'
+                            }}
+                            placeholder="Seleccione una categoria"
+                            open={abrirDrop}
+                            value={valorDrop}
+                            items={arrayCategoriasActivas}
+                            setOpen={setAbrirDrop}
+                            setValue={setValorDrop}
+                            setItems={setArrayCategorias}
+                            onChangeValue={(value) => {
+                              ValidarCategoria()
+                            }}
+                          />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeDrop}</Text>
+                          <Text>Ingrese la descripción</Text>
+                          <TextInput
+                            placeholder='Descripción'
+                            onChangeText={handleChange('descripcion')}
+                            onBlur={() => setFieldTouched('descripcion')} />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.descripcion}</Text>
+                          <Text>Ingrese el precio</Text>
+                          <TextInput
+                            placeholder='Precio'
+                            onChangeText={handleChange('precio')}
+                            onBlur={() => setFieldTouched('precio')} />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.precio}</Text>
+                          <Text>Ingrese el stock</Text>
+                          <TextInput
+                            placeholder='Stock'
+                            onChangeText={handleChange('stock')}
+                            onBlur={() => setFieldTouched('stock')} />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.stock}</Text>
+                          <Button
+                            mode="contained"
+                            style={styles.buttonPaperModal}
+                            onPress={() => {
+                              pickImage();
+                            }}>
+                            Seleccionar imagen
+                          </Button>
+                          <View style={styles.center}>
+                            {image && <Image source={{ uri: image.uri }} style={styles.imagePicker} />}
+                          </View>
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeImagen}</Text>
+                          <Button
+                            mode="contained"
+                            style={styles.buttonPaperModal}
+                            onPress={
+                              handleSubmit
+                            }>
+                            Confirmar
+                          </Button>
+                          <Button
+                            mode="contained"
+                            style={styles.buttonPaperModal}
+                            onPress={() => {
+                              setModalVisible(false);
+                            }}>
+                            Cancelar
+                          </Button>
                         </ScrollView>
                       </View>
                     )}
@@ -408,43 +410,45 @@ export default function AdmProductos() {
             {modalEdicionVisible ? (<Portal>
               <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
                 <Dialog.Content>
-                  <Text>Nombre</Text>
-                  <TextInput value={inputNombre} onChangeText={(text) => setInputNombre(text)} />
-                  <DropDownPicker
-                    schema={{
-                      label: 'nombre',
-                      value: 'id'
-                    }}
-                    placeholder="Seleccione una categoria"
-                    open={abrirDrop}
-                    value={valorDrop}
-                    items={arrayCategoriasActivas}
-                    setOpen={setAbrirDrop}
-                    setValue={setValorDrop}
-                    setItems={setArrayCategorias}
-                  />
-                  <Text>Descripción</Text>
-                  <TextInput value={inputDescripcion} onChangeText={(text) => setInputDescripcion(text)} />
-                  <Text>Precio</Text>
-                  <TextInput value={inputPrecio} onChangeText={(text) => setInputPrecio(text)} />
-                  <Text>Stock</Text>
-                  <TextInput value={inputStock} onChangeText={(text) => setInputStock(text)} />
-                  <Button
-                    mode="contained"
-                    style={styles.buttonPaperModal}
-                    onPress={() => {
-                      EditarProducto();
-                    }}>
-                    Actualizar
-                  </Button>
-                  <Button
-                    mode="contained"
-                    style={styles.buttonPaperModal}
-                    onPress={() => {
-                      setEdicionModalVisible(false);
-                    }}>
-                    Cancelar
-                  </Button>
+                  <ScrollView>
+                    <Text>Nombre</Text>
+                    <TextInput value={inputNombre} onChangeText={(text) => setInputNombre(text)} />
+                    <DropDownPicker
+                      schema={{
+                        label: 'nombre',
+                        value: 'id'
+                      }}
+                      placeholder="Seleccione una categoria"
+                      open={abrirDrop}
+                      value={valorDrop}
+                      items={arrayCategoriasActivas}
+                      setOpen={setAbrirDrop}
+                      setValue={setValorDrop}
+                      setItems={setArrayCategorias}
+                    />
+                    <Text>Descripción</Text>
+                    <TextInput value={inputDescripcion} onChangeText={(text) => setInputDescripcion(text)} />
+                    <Text>Precio</Text>
+                    <TextInput value={inputPrecio} onChangeText={(text) => setInputPrecio(text)} />
+                    <Text>Stock</Text>
+                    <TextInput value={inputStock} onChangeText={(text) => setInputStock(text)} />
+                    <Button
+                      mode="contained"
+                      style={styles.buttonPaperModal}
+                      onPress={() => {
+                        EditarProducto();
+                      }}>
+                      Actualizar
+                    </Button>
+                    <Button
+                      mode="contained"
+                      style={styles.buttonPaperModal}
+                      onPress={() => {
+                        setEdicionModalVisible(false);
+                      }}>
+                      Cancelar
+                    </Button>
+                  </ScrollView>
                 </Dialog.Content>
               </Dialog>
             </Portal>) : (<View></View>)}
@@ -553,5 +557,14 @@ const styles = StyleSheet.create({
   activityIndicator: {
     marginTop: width.height / 3,
 
+  },
+  imagePicker: {
+    width: 200,
+    height: 200,
+    marginTop: 8,
+    borderRadius: 20,
+  },
+  center: {
+    alignItems: 'center',
   }
 })
