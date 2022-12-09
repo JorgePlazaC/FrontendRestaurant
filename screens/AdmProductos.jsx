@@ -8,8 +8,11 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 //import { TextInput } from 'react-native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
+import { Formik } from "formik";
+import * as yup from 'yup'
 
 import RestaurantContext from '../src/components/RestaurantContext'
+import CategoriasInactivas from './CategoriasInactivas'
 
 const width = Dimensions.get('window')
 
@@ -28,12 +31,14 @@ export default function AdmProductos() {
   const urlInactivos = `${baseUrl}/api/productosInactivos`
 
   const urlCategorias = `${baseUrl}/api/categorias`
+  const urlCategoriasInactivas = `${baseUrl}/api/categoriasActivos`
   const urlImagen = `${baseUrl}/api/imagens`
 
   //UseState
   const [arrayProductos, setArrayProductos] = useState([])
   const [arrayProductosInactivas, setArrayProductosInactivas] = useState([])
   const [arrayCategorias, setArrayCategorias] = useState([])
+  const [arrayCategoriasActivas, setArrayCategoriasActivas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalEdicionVisible, setEdicionModalVisible] = useState(false)
@@ -68,13 +73,15 @@ export default function AdmProductos() {
       urlActivos,
       urlInactivos,
       urlCategorias,
+      urlCategoriasInactivas,
     ];
     try {
-      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }]) => {
+      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }, {data: categoriasInactivos}]) => {
         setArrayProductos(await productos)
         setProductosActivas(await prodActivos)
         setArrayProductosInactivas(await prodInactivos)
         setArrayCategorias(await categorias)
+        setArrayCategoriasActivas(await categoriasInactivos)
       });
       setCargando(false)
     } catch (error) {
@@ -269,7 +276,7 @@ export default function AdmProductos() {
                 placeholder="Seleccione una categoria"
                 open={abrirDrop}
                 value={valorDrop}
-                items={arrayCategorias}
+                items={arrayCategoriasActivas}
                 setOpen={setAbrirDrop}
                 setValue={setValorDrop}
                 setItems={setArrayCategorias}
@@ -321,7 +328,7 @@ export default function AdmProductos() {
                 placeholder="Seleccione una categoria"
                 open={abrirDrop}
                 value={valorDrop}
-                items={arrayCategorias}
+                items={arrayCategoriasActivas}
                 setOpen={setAbrirDrop}
                 setValue={setValorDrop}
                 setItems={setArrayCategorias}

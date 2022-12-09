@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity,ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 //import { TextInput } from 'react-native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
+import { Formik } from "formik";
+import * as yup from 'yup'
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -66,7 +68,8 @@ export default function AdmMesas() {
   }
 
   //Ingreso de datos y modificaciones a API
-  const Confirmar = async () => {
+  const Confirmar = async (valores) => {
+    inputMesas = valores.numMesas
     setCargando(true)
     setModalVisible(false)
     try {
@@ -79,7 +82,8 @@ export default function AdmMesas() {
     }
   }
 
-  const EditarCategoria = async () => {
+  const EditarCategoria = async (valores) => {
+    inputMesas = valores.numMesas
     setCargando(true)
     setEdicionModalVisible(false)
     let urlEdicion = `${url}/${mesaEdit.id}`
@@ -124,6 +128,16 @@ export default function AdmMesas() {
     setMesaEdit(mesa)
     setBorrarModalVisible(true)
   }
+
+  //Validaciones
+  const mesasValidationSchema = yup.object().shape({
+    numMesas: yup
+      .string()
+      .matches(/^\d*$/, 'El número de la mesa tiene que ser un valor numerico')
+      .max(2, 'El número no puede tener mas de 2 digitos')
+      .required('El campo categoria es requerido.'),
+  })
+
 
   const Item = ({ title }) => (
     <View style={styles.viewBody}>
@@ -181,48 +195,79 @@ export default function AdmMesas() {
           <Portal>
             <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
               <Dialog.Content>
-                <Text>Ingrese el número de la mesa</Text>
-                <TextInput placeholder='Número de mesa' onChangeText={(text) => inputMesas = text} />
-                <Button
-                  mode="contained"
-                  style={styles.buttonPaperModal}
-                  onPress={() => {
-                    Confirmar();
-                  }}>
-                  Confirmar
-                </Button>
-                <Button
-                  mode="contained"
-                  style={styles.buttonPaperModal}
-                  onPress={() => {
-                    setModalVisible(false);
-                  }}>
-                  Cancelar
-                </Button>
+                <Formik
+                  initialValues={{ numMesas: '' }}
+                  validationSchema={mesasValidationSchema}
+                  onSubmit={(values) => { Confirmar(values) }}>
+                  {({
+                    handleSubmit, errors, handleChange, touched, setFieldTouched, isValid, values
+                  }) => (
+                    <View>
+                      <Text>Ingrese el número de la mesa</Text>
+                      <TextInput
+                        value={values.numMesas}
+                        placeholder='Número de mesa'
+                        onChangeText={handleChange('numMesas')}
+                        onBlur={() => setFieldTouched('numMesas')}
+                      />
+                      <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.numMesas}</Text>
+                      <Button
+                        mode="contained"
+                        style={styles.buttonPaperModal}
+                        onPress={
+                          handleSubmit
+                        }>
+                        Confirmar
+                      </Button>
+                      <Button
+                        mode="contained"
+                        style={styles.buttonPaperModal}
+                        onPress={() => {
+                          setModalVisible(false);
+                        }}>
+                        Cancelar
+                      </Button>
+                    </View>
+                  )}
+                </Formik>
               </Dialog.Content>
             </Dialog>
           </Portal>
           <Portal>
             <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
               <Dialog.Content>
-                <Text>Cambiar número de mesa</Text>
-                <TextInput placeholder='Nuevo número' onChangeText={(text) => inputMesas = text} />
-                <Button
-                  mode="contained"
-                  style={styles.buttonPaperModal}
-                  onPress={() => {
-                    EditarCategoria();
-                  }}>
-                  Actualizar
-                </Button>
-                <Button
-                  mode="contained"
-                  style={styles.buttonPaperModal}
-                  onPress={() => {
-                    setEdicionModalVisible(false);
-                  }}>
-                  Cancelar
-                </Button>
+                <Formik
+                  initialValues={{ numMesas: '' }}
+                  validationSchema={mesasValidationSchema}
+                  onSubmit={(values) => { EditarCategoria(values) }}>
+                  {({
+                    handleSubmit, errors, handleChange, touched, setFieldTouched, isValid, values
+                  }) => (
+                    <View>
+                      <Text>Cambiar número de mesa</Text>
+                      <TextInput placeholder='Nuevo número' 
+                      onChangeText={handleChange('numMesas')}
+                      onBlur={() => setFieldTouched('numMesas')} />
+                      <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.numMesas}</Text>
+                      <Button
+                        mode="contained"
+                        style={styles.buttonPaperModal}
+                        onPress={
+                          handleSubmit
+                        }>
+                        Actualizar
+                      </Button>
+                      <Button
+                        mode="contained"
+                        style={styles.buttonPaperModal}
+                        onPress={() => {
+                          setEdicionModalVisible(false);
+                        }}>
+                        Cancelar
+                      </Button>
+                    </View>
+                  )}
+                </Formik>
               </Dialog.Content>
             </Dialog>
           </Portal>
@@ -319,7 +364,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   activityIndicator: {
-    marginTop: width.height/3,
-    
+    marginTop: width.height / 3,
+
   }
 })

@@ -156,7 +156,7 @@ export default function CategoriasInactivas() {
           <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
             <Dialog.Content>
               <Formik
-                initialValues={{ email: '' }}
+                initialValues={{ categoria: '' }}
                 validationSchema={categoriaValidationSchema}
                 onSubmit={(values) => { EditarCategoria(values) }}>
                 {({

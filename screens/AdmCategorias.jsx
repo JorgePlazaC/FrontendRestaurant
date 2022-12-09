@@ -190,7 +190,7 @@ export default function AdmCategorias() {
               <Dialog visible={modalVisible} onDismiss={ocultarModalAgregar}>
                 <Dialog.Content>
                   <Formik
-                    initialValues={{ email: '' }}
+                    initialValues={{ categoria: '' }}
                     validationSchema={categoriaValidationSchema}
                     onSubmit={(values) => { Confirmar(values) }}>
                     {({
@@ -233,7 +233,7 @@ export default function AdmCategorias() {
               <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
                 <Dialog.Content>
                   <Formik
-                    initialValues={{ email: '' }}
+                    initialValues={{ categoria: '' }}
                     validationSchema={categoriaValidationSchema}
                     onSubmit={(values) => { EditarCategoria(values) }}>
                     {({
