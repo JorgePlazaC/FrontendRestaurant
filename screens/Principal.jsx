@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
@@ -9,7 +9,9 @@ export default function Principal() {
   const navigation = useNavigation()
   return (
     <View style={styles.viewBody}>
-      <Text>Bienvenido al restaurant</Text>
+      <Text style={styles.textTitulo}>¡Bienvenido al restaurant!</Text>
+      <Image style={styles.icon} source={require("../src/images/logo.png")}/>
+      <Text style={styles.text}>¿Eres un cliente o un administrador?</Text>
       <Button
         mode="contained"
         style={styles.buttonPaper}
@@ -32,7 +34,8 @@ export default function Principal() {
 
 const styles = StyleSheet.create({
   viewBody: {
-    marginHorizontal: 30,
+    marginHorizontal: 20,
+    alignItems: 'center',
   },
   modalBackGround: {
     flex: 1,
@@ -45,11 +48,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
 
   },
-  text: {
-    flex: 0.6,
+  textTitulo: {
     marginTop: 30,
+    marginBottom:30,
     marginLeft: 15,
-    fontSize: 20,
+    fontSize: 22,
+  },
+  text: {
+    marginTop: 30,
+    marginBottom:30,
+    marginLeft: 15,
+    fontSize: 18,
   },
   button: {
     backgroundColor: '#58ACFA',
@@ -76,8 +85,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   icon: {
-    maxHeight: 20,
-    maxWidth: 20,
+    maxHeight: 200,
+    maxWidth: 200,
     marginBottom: 20,
   },
   buttonPaper: {

@@ -38,9 +38,7 @@ export default function MesasInactivas() {
   const [modalInactivosVisible, setInactivosModalVisible] = useState(false)
   const [modalHabilitarVisible, setHabilitarModalVisible] = useState(false)
   const [mesaEdit, setMesaEdit] = useState()
-
-  //Varibales inputs de pantalla
-  let inputMesas = ""
+  const [inputMesas, setInputMesas] = useState()
 
   useEffect(() => {
     (async () => {
@@ -69,13 +67,12 @@ export default function MesasInactivas() {
   }
 
   const EditarCategoria = async (valores) => {
-    inputMesas = valores.numMesas
     setCargando(true)
     setEdicionModalVisible(false)
     let urlEdicion = `${url}/${mesaEdit.id}`
     console.log(urlEdicion)
     try {
-      const response = await axios.put(urlEdicion, { numMesa: inputMesas })
+      const response = await axios.put(urlEdicion, { numMesa: valores.numMesas })
       console.log(await response.data)
       await fetchAllAxios()
       FormatearInputs()
@@ -100,12 +97,13 @@ export default function MesasInactivas() {
 
   //Formatear inputs
   const FormatearInputs = () => {
-    inputMesas = ""
+    setInputMesas("")
   }
 
   //Modals
   const ModalEdicion = (mesa) => {
     setMesaEdit(mesa)
+    setInputMesas(mesa.numMesa)
     setEdicionModalVisible(true)
   }
 
@@ -163,7 +161,7 @@ export default function MesasInactivas() {
               <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
                 <Dialog.Content>
                   <Formik
-                    initialValues={{ numMesas: '' }}
+                    initialValues={{ numMesas: inputMesas }}
                     validationSchema={mesasValidationSchema}
                     onSubmit={(values) => { EditarCategoria(values) }}>
                     {({

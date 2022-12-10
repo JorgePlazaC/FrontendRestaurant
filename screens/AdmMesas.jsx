@@ -37,9 +37,7 @@ export default function AdmMesas() {
   const [modalInactivosVisible, setInactivosModalVisible] = useState(false)
   const [modalHabilitarVisible, setHabilitarModalVisible] = useState(false)
   const [mesaEdit, setMesaEdit] = useState()
-
-  //Varibales inputs de pantalla
-  let inputMesas = ""
+  const [inputMesas, setInputMesas] = useState()
 
   useEffect(() => {
     (async () => {
@@ -69,11 +67,10 @@ export default function AdmMesas() {
 
   //Ingreso de datos y modificaciones a API
   const Confirmar = async (valores) => {
-    inputMesas = valores.numMesas
     setCargando(true)
     setModalVisible(false)
     try {
-      const response = await axios.post(url, { numMesa: inputMesas })
+      const response = await axios.post(url, { numMesa: valores.numMesas })
       console.log(await response.data)
       await fetchAllAxios()
       FormatearInputs()
@@ -83,13 +80,12 @@ export default function AdmMesas() {
   }
 
   const EditarCategoria = async (valores) => {
-    inputMesas = valores.numMesas
     setCargando(true)
     setEdicionModalVisible(false)
     let urlEdicion = `${url}/${mesaEdit.id}`
     console.log(urlEdicion)
     try {
-      const response = await axios.put(urlEdicion, { numMesa: inputMesas })
+      const response = await axios.put(urlEdicion, { numMesa: valores.numMesas })
       console.log(await response.data)
       await fetchAllAxios()
       FormatearInputs()
@@ -115,12 +111,14 @@ export default function AdmMesas() {
 
   //Formatear inputs
   const FormatearInputs = () => {
-    inputMesas = ""
+    setInputMesas()
   }
 
   //Modals
   const ModalEdicion = (mesa) => {
     setMesaEdit(mesa)
+    setInputMesas(mesa.numMesa)
+    console.log(inputMesas)
     setEdicionModalVisible(true)
   }
 
@@ -237,7 +235,7 @@ export default function AdmMesas() {
             <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
               <Dialog.Content>
                 <Formik
-                  initialValues={{ numMesas: '' }}
+                  initialValues={{ numMesas: inputMesas }}
                   validationSchema={mesasValidationSchema}
                   onSubmit={(values) => { EditarCategoria(values) }}>
                   {({
@@ -245,7 +243,8 @@ export default function AdmMesas() {
                   }) => (
                     <View>
                       <Text>Cambiar número de mesa</Text>
-                      <TextInput placeholder='Nuevo número' 
+                      <TextInput 
+                      value={values.numMesas}
                       onChangeText={handleChange('numMesas')}
                       onBlur={() => setFieldTouched('numMesas')} />
                       <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.numMesas}</Text>

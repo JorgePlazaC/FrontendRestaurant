@@ -10,6 +10,7 @@ export default function Administrador() {
 
   return (
     <View style={styles.viewBody}>
+      <Text style={styles.text}>Ingrese a la sección que desea administrar</Text>
       <View>
         <Button
           mode="contained"
@@ -56,10 +57,9 @@ const styles = StyleSheet.create({
 
   },
   text: {
-    flex: 0.6,
-    marginTop: 30,
-    marginLeft: 15,
-    fontSize: 20,
+    marginTop: 10,
+    marginBottom:8,
+    fontSize: 18,
   },
   button: {
     backgroundColor: '#58ACFA',

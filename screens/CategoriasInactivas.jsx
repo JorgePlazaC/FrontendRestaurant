@@ -35,9 +35,7 @@ export default function CategoriasInactivas() {
   const [modalEdicionVisible, setEdicionModalVisible] = useState(false)
   const [modalHabilitarVisible, setHabilitarModalVisible] = useState(false)
   const [categoriaEdit, setCategoriaEdit] = useState()
-
-  //Varibales inputs de pantalla
-  let inputCategoria = ""
+  const [inputCategoria, setInputCategoria] = useState()
 
   useEffect(() => {
     (async () => {
@@ -81,13 +79,12 @@ export default function CategoriasInactivas() {
   }
 
   const EditarCategoria = async (valores) => {
-    inputCategoria = valores.categoria
     setCargando(true)
     setEdicionModalVisible(false)
     let urlEdicion = `${url}/${categoriaEdit.id}`
     console.log(urlEdicion)
     try {
-      const response = await axios.put(urlEdicion, { nombre: inputCategoria })
+      const response = await axios.put(urlEdicion, { nombre: valores.categoria })
       console.log(await response.data)
       await fetchAllAxios()
       FormatearInputs()
@@ -98,12 +95,16 @@ export default function CategoriasInactivas() {
 
   //Formatear inputs
   const FormatearInputs = () => {
-    inputCategoria = ""
+    setInputCategoria("")
   }
 
   //Modals
   const ModalEdicion = (categoria) => {
+
     setCategoriaEdit(categoria)
+
+    setInputCategoria(categoria.nombre)
+    console.log(categoria.nombre)
     setEdicionModalVisible(true)
   }
 
@@ -156,7 +157,7 @@ export default function CategoriasInactivas() {
           <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
             <Dialog.Content>
               <Formik
-                initialValues={{ categoria: '' }}
+                initialValues={{ categoria: inputCategoria }}
                 validationSchema={categoriaValidationSchema}
                 onSubmit={(values) => { EditarCategoria(values) }}>
                 {({
@@ -165,7 +166,7 @@ export default function CategoriasInactivas() {
                   <View>
                     <Text>Ingrese el nuevo nombre de la categoria</Text>
                     <TextInput
-                      placeholder='Nuevo nombre'
+                      value={values.categoria}
                       mode='outlined'
                       onChangeText={handleChange('categoria')}
                       onBlur={() => setFieldTouched('categoria')}

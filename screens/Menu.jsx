@@ -288,7 +288,9 @@ export default function Menu({ navigation }) {
             sections={productosContext}
             keyExtractor={(item, index) => item + index}
             renderSectionHeader={({ section: { title } }) => (
-              <Text style={styles.header}>{title}</Text>
+              <View style={styles.header}>
+              <Text style={styles.textHeader}>{title}</Text>
+              </View>
             )}
             renderItem={({ item }) => <Item title={item} />}
             stickySectionHeadersEnabled
@@ -361,8 +363,14 @@ const styles = StyleSheet.create({
     marginVertical: 8
   },
   header: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems:'center',
+    
+  },
+  textHeader: {
     fontSize: 32,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 24
@@ -459,5 +467,5 @@ const styles = StyleSheet.create({
   },
   viewContenedor: {
     flex: 1,
-  }
+  },
 })

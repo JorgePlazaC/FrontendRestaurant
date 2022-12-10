@@ -34,9 +34,7 @@ export default function AdmCategorias() {
   const [modalEdicionVisible, setEdicionModalVisible] = useState(false)
   const [modalBorrarVisible, setBorrarModalVisible] = useState(false)
   const [categoriaEdit, setCategoriaEdit] = useState()
-
-  //Varibales inputs de pantalla
-  let inputCategoria = ""
+  const [inputCategoria, setInputCategoria] = useState()
 
   useEffect(() => {
     (async () => {
@@ -66,11 +64,10 @@ export default function AdmCategorias() {
 
   //Ingreso de datos y modificaciones a API
   const Confirmar = async (valores) => {
-    inputCategoria = valores.categoria
     setCargando(true)
     setModalVisible(false)
     try {
-      const response = await axios.post(url, { nombre: inputCategoria })
+      const response = await axios.post(url, { nombre: valores.categoria })
       console.log(await response.data)
       await fetchAllAxios()
       FormatearInputs()
@@ -80,13 +77,12 @@ export default function AdmCategorias() {
   }
 
   const EditarCategoria = async (valores) => {
-    inputCategoria = valores.categoria
     setCargando(true)
     setEdicionModalVisible(false)
     let urlEdicion = `${url}/${categoriaEdit.id}`
     console.log(urlEdicion)
     try {
-      const response = await axios.put(urlEdicion, { nombre: inputCategoria })
+      const response = await axios.put(urlEdicion, { nombre: valores.categoria })
       console.log(await response.data)
       await fetchAllAxios()
       FormatearInputs()
@@ -111,12 +107,13 @@ export default function AdmCategorias() {
 
   //Formatear inputs
   const FormatearInputs = () => {
-    inputCategoria = ""
+    setInputCategoria("")
   }
 
   //Modals
   const ModalEdicion = (categoria) => {
     setCategoriaEdit(categoria)
+    setInputCategoria(categoria.nombre)
     setEdicionModalVisible(true)
   }
 
@@ -233,7 +230,7 @@ export default function AdmCategorias() {
               <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
                 <Dialog.Content>
                   <Formik
-                    initialValues={{ categoria: '' }}
+                    initialValues={{ categoria: inputCategoria }}
                     validationSchema={categoriaValidationSchema}
                     onSubmit={(values) => { EditarCategoria(values) }}>
                     {({
@@ -242,7 +239,7 @@ export default function AdmCategorias() {
                       <View>
                         <Text>Ingrese el nuevo nombre de la categoria</Text>
                         <TextInput
-                          placeholder='Nuevo nombre'
+                          value={values.categoria}
                           mode='outlined'
                           onChangeText={handleChange('categoria')}
                           onBlur={() => setFieldTouched('categoria')}

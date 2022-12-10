@@ -72,6 +72,7 @@ export default function Resumen({ navigation }) {
 
   return (
     <View centerContent style={styles.viewBody}>
+      <Text style={styles.text}>Resúmen de tu pedido:</Text>
       <View style={styles.viewResumen}>
         <FlatList
           style={styles.flatList}
@@ -126,5 +127,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
     backgroundColor: '#D8D8D8'
+  },
+  text: {
+    marginTop: 10,
+    marginBottom:8,
+    fontSize: 18,
   },
 })

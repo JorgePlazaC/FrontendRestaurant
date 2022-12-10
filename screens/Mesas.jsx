@@ -49,10 +49,10 @@ export default function Mesas() {
 
   //Metodo que ingresa al useContext la mesa elegida
   const ElegirMesa = () => {
-    if(valorDrop == null){
+    if (valorDrop == null) {
       setModalVisible(true)
       return
-    } else{
+    } else {
       setMesa(valorDrop)
       navigation.navigate("menu")
     }
@@ -87,20 +87,22 @@ export default function Mesas() {
             Aceptar
           </Button>
           <Portal>
-        <Dialog visible={modalVisible} onDismiss={ocultarModal}>
-          <Dialog.Content>
-            <Text>Debe seleccionar una mesa</Text>
-            <Button
-              mode="contained"
-              style={styles.buttonPaperModal}
-              onPress={() => {
-                setModalVisible(false);
-              }}>
-              Cancelar
-            </Button>
-          </Dialog.Content>
-        </Dialog>
-      </Portal>
+            <Dialog visible={modalVisible} onDismiss={ocultarModal}>
+              <Dialog.Content>
+                <View style={styles.viewBody}>
+                  <Text style={styles.text}>Debe seleccionar una mesa</Text>
+                  <Button
+                    mode="contained"
+                    style={styles.buttonPaperModal}
+                    onPress={() => {
+                      setModalVisible(false);
+                    }}>
+                    Ok
+                  </Button>
+                </View>
+              </Dialog.Content>
+            </Dialog>
+          </Portal>
         </View>)}
     </View>
   )
@@ -108,7 +110,8 @@ export default function Mesas() {
 
 const styles = StyleSheet.create({
   viewBody: {
-    marginHorizontal: 30
+    marginHorizontal: 30,
+    alignItems: 'center',
   },
   button: {
     backgroundColor: "#442484",
@@ -117,7 +120,7 @@ const styles = StyleSheet.create({
   text: {
     marginTop: 15,
     marginBottom: 15,
-    fontSize: 15,
+    fontSize: 18,
   },
   buttonPaper: {
     marginTop: 10,

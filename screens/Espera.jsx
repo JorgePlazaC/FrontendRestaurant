@@ -36,7 +36,7 @@ export default function Espera() {
   }
   return (
     <View style={styles.viewBody}>
-      <Text>Espera</Text>
+      <Text style={styles.text}>Esperando el tiempo de preparación</Text>
       <Button
         mode="contained"
         style={styles.buttonPaper}
@@ -59,5 +59,10 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     marginHorizontal: 30,
     backgroundColor: '#58ACFA'
+  },
+  text: {
+    marginTop: 10,
+    marginBottom:8,
+    fontSize: 18,
   },
 })
