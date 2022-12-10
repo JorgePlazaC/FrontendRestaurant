@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Dimensions, FlatList, Image, TouchableOpacity, ActivityIndicator, LogBox } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
@@ -66,6 +66,7 @@ export default function AdmProductos() {
       await fetchAllAxios()
       const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync()
       setHasGalleryPermission(galleryStatus === 'granted')
+      //LogBox.ignoreAllLogs()
     })()
   }, [])
 
@@ -349,6 +350,7 @@ export default function AdmProductos() {
                             setOpen={setAbrirDrop}
                             setValue={setValorDrop}
                             setItems={setArrayCategorias}
+                            listMode="SCROLLVIEW"
                             onChangeValue={(value) => {
                               ValidarCategoria()
                             }}
@@ -410,45 +412,80 @@ export default function AdmProductos() {
             {modalEdicionVisible ? (<Portal>
               <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
                 <Dialog.Content>
-                  <ScrollView>
-                    <Text>Nombre</Text>
-                    <TextInput value={inputNombre} onChangeText={(text) => setInputNombre(text)} />
-                    <DropDownPicker
-                      schema={{
-                        label: 'nombre',
-                        value: 'id'
-                      }}
-                      placeholder="Seleccione una categoria"
-                      open={abrirDrop}
-                      value={valorDrop}
-                      items={arrayCategoriasActivas}
-                      setOpen={setAbrirDrop}
-                      setValue={setValorDrop}
-                      setItems={setArrayCategorias}
-                    />
-                    <Text>Descripción</Text>
-                    <TextInput value={inputDescripcion} onChangeText={(text) => setInputDescripcion(text)} />
-                    <Text>Precio</Text>
-                    <TextInput value={inputPrecio} onChangeText={(text) => setInputPrecio(text)} />
-                    <Text>Stock</Text>
-                    <TextInput value={inputStock} onChangeText={(text) => setInputStock(text)} />
-                    <Button
-                      mode="contained"
-                      style={styles.buttonPaperModal}
-                      onPress={() => {
-                        EditarProducto();
-                      }}>
-                      Actualizar
-                    </Button>
-                    <Button
-                      mode="contained"
-                      style={styles.buttonPaperModal}
-                      onPress={() => {
-                        setEdicionModalVisible(false);
-                      }}>
-                      Cancelar
-                    </Button>
-                  </ScrollView>
+
+                  <Formik
+                    initialValues={{ nombre: inputNombre, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock }}
+                    validationSchema={productosValidationSchema}
+                    onSubmit={(values) => { EditarProducto(values) }}>
+                    {({
+                      handleSubmit, errors, handleChange, touched, setFieldTouched, isValid, values
+                    }) => (
+                      <View>
+                        <ScrollView>
+                          <Text>Ingrese el nombre</Text>
+                          <TextInput 
+                            value={inputNombre}
+                            onChangeText={handleChange('nombre')}
+                            onBlur={() => setFieldTouched('nombre')} />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.nombre}</Text>
+                          <Text>Elija una categoria</Text>
+                          <DropDownPicker
+                            schema={{
+                              label: 'nombre',
+                              value: 'id'
+                            }}
+                            placeholder="Seleccione una categoria"
+                            open={abrirDrop}
+                            value={valorDrop}
+                            items={arrayCategoriasActivas}
+                            setOpen={setAbrirDrop}
+                            setValue={setValorDrop}
+                            setItems={setArrayCategorias}
+                            listMode="SCROLLVIEW"
+                            onChangeValue={(value) => {
+                              ValidarCategoria()
+                            }}
+                          />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeDrop}</Text>
+                          <Text>Ingrese la descripción</Text>
+                          <TextInput
+                            value={inputDescripcion}
+                            onChangeText={handleChange('descripcion')}
+                            onBlur={() => setFieldTouched('descripcion')} />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.descripcion}</Text>
+                          <Text>Ingrese el precio</Text>
+                          <TextInput
+                            value={inputPrecio}
+                            onChangeText={handleChange('precio')}
+                            onBlur={() => setFieldTouched('precio')} />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.precio}</Text>
+                          <Text>Ingrese el stock</Text>
+                          <TextInput
+                            value={inputStock}
+                            onChangeText={handleChange('stock')}
+                            onBlur={() => setFieldTouched('stock')} />
+                          <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.stock}</Text>
+                          <Button
+                            mode="contained"
+                            style={styles.buttonPaperModal}
+                            onPress={
+                              handleSubmit
+                            }>
+                            Actualizar
+                          </Button>
+                          <Button
+                            mode="contained"
+                            style={styles.buttonPaperModal}
+                            onPress={() => {
+                              setEdicionModalVisible(false);
+                            }}>
+                            Cancelar
+                          </Button>
+                        </ScrollView>
+                      </View>
+                    )}
+                  </Formik>
+
                 </Dialog.Content>
               </Dialog>
             </Portal>) : (<View></View>)}
