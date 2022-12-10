@@ -333,6 +333,14 @@ export default function Menu({ navigation }) {
                         +
                       </Button>
                     </View>
+                    <Button
+                        mode="contained"
+                        style={styles.buttonPaperModal}
+                        onPress={() => {
+                          ocultarModal();
+                        }}>
+                        Cerrar
+                      </Button>
                   </View>)}
 
               </Dialog.Content>

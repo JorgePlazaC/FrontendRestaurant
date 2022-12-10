@@ -20,7 +20,7 @@ export default function Mesas() {
   const url = `${baseUrl}/api/mesasActivos`
 
   //UseContext
-  const { mesa, setMesa } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro } = useContext(RestaurantContext)
 
   //UseState
   const [array, setArray] = useState()
@@ -54,6 +54,7 @@ export default function Mesas() {
       return
     } else {
       setMesa(valorDrop)
+      setCarro([])
       navigation.navigate("menu")
     }
   }

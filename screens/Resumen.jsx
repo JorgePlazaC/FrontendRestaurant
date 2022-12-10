@@ -73,25 +73,28 @@ export default function Resumen({ navigation }) {
   return (
     <View centerContent style={styles.viewBody}>
       <Text style={styles.text}>Resúmen de tu pedido:</Text>
-      <View style={styles.viewResumen}>
-        <FlatList
-          style={styles.flatList}
-          data={carro}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => item + index}
-        />
-      </View>
-      <View style={styles.total}>
-        <Text>Total: {CalcTotal()}</Text>
-      </View>
-      <Button
-        mode="contained"
-        style={styles.buttonPaper}
-        onPress={() => {
-          Confirmar().finally(() => { { navigation.navigate("espera") } });
-        }}>
-        Confirmar
-      </Button>
+      {carro.length == 0 ? (<Text>No hay productos en el carro</Text>) :
+        (<View>
+          <View style={styles.viewResumen}>
+            <FlatList
+              style={styles.flatList}
+              data={carro}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => item + index}
+            />
+          </View>
+          <View style={styles.total}>
+            <Text>Total: {CalcTotal()}</Text>
+          </View>
+          <Button
+            mode="contained"
+            style={styles.buttonPaper}
+            onPress={() => {
+              Confirmar().finally(() => { { navigation.navigate("espera") } });
+            }}>
+            Confirmar
+          </Button>
+        </View>)}
     </View>
   )
 }
@@ -110,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#442484"
   },
   flatList: {
-    maxHeight: width.height - 150,
+    maxHeight: width.height - 200,
   },
   buttonPaper: {
     marginTop: 3,
@@ -130,7 +133,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 10,
-    marginBottom:8,
+    marginBottom: 8,
     fontSize: 18,
   },
 })
