@@ -32,7 +32,7 @@ export default function AdmProductos() {
   const urlInactivos = `${baseUrl}/api/productosInactivos`
 
   const urlCategorias = `${baseUrl}/api/categorias`
-  const urlCategoriasInactivas = `${baseUrl}/api/categoriasActivos`
+  const urlCategoriasActivas = `${baseUrl}/api/categoriasActivos`
   const urlImagen = `${baseUrl}/api/imagens`
 
   //UseState
@@ -77,15 +77,15 @@ export default function AdmProductos() {
       urlActivos,
       urlInactivos,
       urlCategorias,
-      urlCategoriasInactivas,
+      urlCategoriasActivas,
     ];
     try {
-      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }, { data: categoriasInactivos }]) => {
+      await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }, { data: categoriasActivos }]) => {
         setArrayProductos(await productos)
         setProductosActivas(await prodActivos)
         setArrayProductosInactivas(await prodInactivos)
         setArrayCategorias(await categorias)
-        setArrayCategoriasActivas(await categoriasInactivos)
+        setArrayCategoriasActivas(await categoriasActivos)
       });
       setCargando(false)
     } catch (error) {
@@ -162,12 +162,12 @@ export default function AdmProductos() {
     }
   };
 
-  const EditarProducto = async () => {
+  const EditarProducto = async (valores) => {
     setCargando(true)
     setEdicionModalVisible(false)
     let urlEdicion = `${url}/${productosEdit.id}`
     try {
-      const response = await axios.put(urlEdicion, { nombre: inputNombre, idCategoria: valorDrop, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock })
+      const response = await axios.put(urlEdicion, { nombre: valores.nombre, idCategoria: valorDrop, descripcion: valores.descripcion, precio: parseInt(valores.precio), stock: parseInt(valores.stock) })
       console.log(await response.data)
       await fetchAllAxios()
       FormatearInputs()
@@ -424,7 +424,7 @@ export default function AdmProductos() {
                         <ScrollView>
                           <Text>Ingrese el nombre</Text>
                           <TextInput 
-                            value={inputNombre}
+                            value={values.nombre}
                             onChangeText={handleChange('nombre')}
                             onBlur={() => setFieldTouched('nombre')} />
                           <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.nombre}</Text>
@@ -449,19 +449,19 @@ export default function AdmProductos() {
                           <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeDrop}</Text>
                           <Text>Ingrese la descripción</Text>
                           <TextInput
-                            value={inputDescripcion}
+                            value={values.descripcion}
                             onChangeText={handleChange('descripcion')}
                             onBlur={() => setFieldTouched('descripcion')} />
                           <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.descripcion}</Text>
                           <Text>Ingrese el precio</Text>
                           <TextInput
-                            value={inputPrecio}
+                            value={values.precio}
                             onChangeText={handleChange('precio')}
                             onBlur={() => setFieldTouched('precio')} />
                           <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.precio}</Text>
                           <Text>Ingrese el stock</Text>
                           <TextInput
-                            value={inputStock}
+                            value={values.stock}
                             onChangeText={handleChange('stock')}
                             onBlur={() => setFieldTouched('stock')} />
                           <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.stock}</Text>

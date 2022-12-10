@@ -8,6 +8,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Modal } from 'react-native'
 //import { TextInput } from 'react-native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
+import { Formik } from "formik";
+import * as yup from 'yup'
 
 import RestaurantContext from '../src/components/RestaurantContext'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -29,6 +31,7 @@ export default function ProductosActivos() {
     const urlInactivos = `${baseUrl}/api/productosInactivos`
 
     const urlCategorias = `${baseUrl}/api/categorias`
+    const urlCategoriasActivas = `${baseUrl}/api/categoriasActivos`
     const urlImagen = `${baseUrl}/api/imagens`
 
     //UseState
@@ -36,6 +39,7 @@ export default function ProductosActivos() {
     const [arrayProductosActivas, setArrayProductosActivas] = useState([])
     const [arrayProductosInactivas, setArrayProductosInactivas] = useState([])
     const [arrayCategorias, setArrayCategorias] = useState([])
+    const [arrayCategoriasActivas, setArrayCategoriasActivas] = useState([])
     const [cargando, setCargando] = useState(true)
     const [modalVisible, setModalVisible] = useState(false)
     const [modalEdicionVisible, setEdicionModalVisible] = useState(false)
@@ -52,6 +56,7 @@ export default function ProductosActivos() {
     const [inputPrecio, setInputPrecio] = useState()
     const [inputStock, setInputStock] = useState()
     const [subiendoImagen, setSubiendoImagen] = useState(false)
+    const [mensajeDrop, setMensajeDrop] = useState()
 
     const cantFetch = 0
 
@@ -70,13 +75,15 @@ export default function ProductosActivos() {
             urlActivos,
             urlInactivos,
             urlCategorias,
+            urlCategoriasActivas,
         ];
         try {
-            await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }]) => {
+            await Promise.all(api.map(async (api) => await axios.get(api))).then(async ([{ data: productos }, { data: prodActivos }, { data: prodInactivos }, { data: categorias }, { data: categoriasActivos }]) => {
                 setArrayProductos(await productos)
                 setProductosActivas(await prodActivos)
                 setArrayProductosInactivas(await prodInactivos)
                 setArrayCategorias(await categorias)
+                setArrayCategoriasActivas(await categoriasActivos)
             });
             setCargando(false)
         } catch (error) {
@@ -84,12 +91,12 @@ export default function ProductosActivos() {
         }
     }
 
-    const EditarProducto = async () => {
+    const EditarProducto = async (valores) => {
         setCargando(true)
         setEdicionModalVisible(false)
         let urlEdicion = `${url}/${productosEdit.id}`
         try {
-            const response = await axios.put(urlEdicion, { nombre: inputNombre, idCategoria: valorDrop, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock })
+            const response = await axios.put(urlEdicion, { nombre: valores.nombre, idCategoria: valorDrop, descripcion: valores.descripcion, precio: parseInt(valores.precio), stock: parseInt(valores.stock) })
             console.log(await response.data)
             await fetchAllAxios()
             FormatearInputs()
@@ -124,6 +131,10 @@ export default function ProductosActivos() {
     const ModalEdicion = (producto) => {
         setProductosEdit(producto)
         setValorDrop(producto.idCategoria)
+        setInputNombre(producto.nombre)
+        setInputDescripcion(producto.descripcion)
+        setInputPrecio(producto.precio.toString())
+        setInputStock(producto.stock.toString())
         setEdicionModalVisible(true)
     }
 
@@ -131,6 +142,39 @@ export default function ProductosActivos() {
         setProductosEdit(producto)
         setHabilitarModalVisible(true)
     }
+
+    //Validaciones
+    const productosValidationSchema = yup.object().shape({
+        nombre: yup
+            .string()
+            .max(30, 'No puede haber mas de 30 digitos')
+            .required('El campo nombre es requerido.'),
+        descripcion: yup
+            .string()
+            .max(30, 'No puede haber mas de 30 digitos')
+            .required('El campo descripción es requerido.'),
+        precio: yup
+            .string()
+            .matches(/^\d*$/, 'El precio tiene que ser un valor numerico')
+            .max(8, 'El precio no puede tener mas de 8 digitos')
+            .required('El campo precio es requerido.'),
+        stock: yup
+            .string()
+            .matches(/^\d*$/, 'El stock tiene que ser un valor numerico')
+            .max(8, 'El stock no puede tener mas de 8 digitos')
+            .required('El campo stock es requerido.'),
+    })
+
+    const ValidarCategoria = () => {
+        if (valorDrop == undefined || valorDrop == null) {
+          setMensajeDrop('Ingrese una categoria')
+          return true
+        } else {
+          setMensajeDrop(undefined)
+          return false
+        }
+      }
+
 
     const Item = ({ title }) => (
         <View style={styles.viewBody}>
@@ -175,43 +219,78 @@ export default function ProductosActivos() {
                     <Dialog visible={modalEdicionVisible} onDismiss={ocultarModalEdicion}>
                         <Dialog.Content>
                             <ScrollView>
-                                <Text>Nombre</Text>
-                                <TextInput value={productosEdit.nombre} onChangeText={(text) => setInputNombre(text)} />
-                                <DropDownPicker
-                                    schema={{
-                                        label: 'nombre',
-                                        value: 'id'
-                                    }}
-                                    placeholder="Seleccione una categoria"
-                                    open={abrirDrop}
-                                    value={valorDrop}
-                                    items={arrayCategorias}
-                                    setOpen={setAbrirDrop}
-                                    setValue={setValorDrop}
-                                    setItems={setArrayCategorias}
-                                />
-                                <Text>Descripción</Text>
-                                <TextInput value={productosEdit.descripcion} onChangeText={(text) => setInputDescripcion(text)} />
-                                <Text>Precio</Text>
-                                <TextInput value={productosEdit.precio.toString()} onChangeText={(text) => setInputPrecio(text)} />
-                                <Text>Stock</Text>
-                                <TextInput value={productosEdit.stock.toString()} onChangeText={(text) => setInputStock(text)} />
-                                <Button
-                                    mode="contained"
-                                    style={styles.buttonPaper}
-                                    onPress={() => {
-                                        EditarProducto();
-                                    }}>
-                                    Actualizar
-                                </Button>
-                                <Button
-                                    mode="contained"
-                                    style={styles.buttonPaper}
-                                    onPress={() => {
-                                        setEdicionModalVisible(false);
-                                    }}>
-                                    Cancelar
-                                </Button>
+                                <Formik
+                                    initialValues={{ nombre: inputNombre, descripcion: inputDescripcion, precio: inputPrecio, stock: inputStock }}
+                                    validationSchema={productosValidationSchema}
+                                    onSubmit={(values) => { EditarProducto(values) }}>
+                                    {({
+                                        handleSubmit, errors, handleChange, touched, setFieldTouched, isValid, values
+                                    }) => (
+                                        <View>
+                                            <ScrollView>
+                                                <Text>Ingrese el nombre</Text>
+                                                <TextInput
+                                                    value={values.nombre}
+                                                    onChangeText={handleChange('nombre')}
+                                                    onBlur={() => setFieldTouched('nombre')} />
+                                                <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.nombre}</Text>
+                                                <Text>Elija una categoria</Text>
+                                                <DropDownPicker
+                                                    schema={{
+                                                        label: 'nombre',
+                                                        value: 'id'
+                                                    }}
+                                                    placeholder="Seleccione una categoria"
+                                                    open={abrirDrop}
+                                                    value={valorDrop}
+                                                    items={arrayCategoriasActivas}
+                                                    setOpen={setAbrirDrop}
+                                                    setValue={setValorDrop}
+                                                    setItems={setArrayCategorias}
+                                                    listMode="SCROLLVIEW"
+                                                    onChangeValue={(value) => {
+                                                        ValidarCategoria()
+                                                    }}
+                                                />
+                                                <Text style={{ fontSize: 12, color: '#FF0D10' }}>{mensajeDrop}</Text>
+                                                <Text>Ingrese la descripción</Text>
+                                                <TextInput
+                                                    value={values.descripcion}
+                                                    onChangeText={handleChange('descripcion')}
+                                                    onBlur={() => setFieldTouched('descripcion')} />
+                                                <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.descripcion}</Text>
+                                                <Text>Ingrese el precio</Text>
+                                                <TextInput
+                                                    value={values.precio}
+                                                    onChangeText={handleChange('precio')}
+                                                    onBlur={() => setFieldTouched('precio')} />
+                                                <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.precio}</Text>
+                                                <Text>Ingrese el stock</Text>
+                                                <TextInput
+                                                    value={values.stock}
+                                                    onChangeText={handleChange('stock')}
+                                                    onBlur={() => setFieldTouched('stock')} />
+                                                <Text style={{ fontSize: 12, color: '#FF0D10' }}>{errors.stock}</Text>
+                                                <Button
+                                                    mode="contained"
+                                                    style={styles.buttonPaperModal}
+                                                    onPress={
+                                                        handleSubmit
+                                                    }>
+                                                    Actualizar
+                                                </Button>
+                                                <Button
+                                                    mode="contained"
+                                                    style={styles.buttonPaperModal}
+                                                    onPress={() => {
+                                                        setEdicionModalVisible(false);
+                                                    }}>
+                                                    Cancelar
+                                                </Button>
+                                            </ScrollView>
+                                        </View>
+                                    )}
+                                </Formik>
                             </ScrollView>
                         </Dialog.Content>
                     </Dialog>
