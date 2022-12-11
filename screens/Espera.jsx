@@ -84,14 +84,6 @@ export default function Espera() {
             size={20}
           />
         </View>) : (<Text style={styles.text}>Esperando el tiempo de preparación</Text>)}
-      <Button
-        mode="contained"
-        style={styles.buttonPaper}
-        onPress={() => {
-          SeguirComprando();
-        }}>
-        Volver a pedir
-      </Button>
     </View>
   )
 }
