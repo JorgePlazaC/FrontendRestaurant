@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, onValue, ref, set } from 'firebase/database'
+import CountDown from 'react-native-countdown-component';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -47,7 +48,7 @@ export default function Espera() {
     onValue(reference, async (snapshot) => {
       const data = await snapshot.val()
       console.log(await data.idFactura)
-      setTiempo(await data.estado)
+      setTiempo(parseInt(await data.tiempo))
 
     })
   }
@@ -72,7 +73,17 @@ export default function Espera() {
   }
   return (
     <View style={styles.viewBody}>
-      <Text style={styles.text}>Esperando el tiempo de preparación</Text>
+      {tiempo > 0 ? (
+        <View>
+          <Text style={styles.text}>Su producto está en preparación</Text>
+          <CountDown
+            until={tiempo}
+            timeToShow={['M', 'S']}
+            digitStyle={{ backgroundColor: '#FFF' }}
+            digitTxtStyle={{ color: '#1CC625' }}
+            size={20}
+          />
+        </View>) : (<Text style={styles.text}>Esperando el tiempo de preparación</Text>)}
       <Button
         mode="contained"
         style={styles.buttonPaper}
@@ -81,16 +92,6 @@ export default function Espera() {
         }}>
         Volver a pedir
       </Button>
-      <Button
-        mode="contained"
-        style={styles.buttonPaper}
-        onPress={() => {
-          fetchFirebase()
-        }}>
-        Firebase
-      </Button>
-
-      <Text>{tiempo}</Text>
     </View>
   )
 }
