@@ -18,13 +18,13 @@ export default function Espera() {
   const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext, idPedido, setIdPedido } = useContext(RestaurantContext)
 
   //UseState
-  const [tiempo,setTiempo] = useState("00:00")
+  const [tiempo, setTiempo] = useState("00:00")
 
   //UseEfect
   useEffect(() => {
-    () => {
-      //fetchFirebase()
-    };
+    (() => {
+      fetchFirebase()
+    })()
   }, [])
 
   //Firebase
@@ -44,11 +44,11 @@ export default function Espera() {
   const fetchFirebase = () => {
     const db = getDatabase()
     const reference = ref(db, 'pedidos/' + idPedido)
-    onValue(reference, (snapshot) =>{
-      const data = snapshot.val()
-      console.log(data.idFactura)
-      setTiempo(data.estado)
-    
+    onValue(reference, async (snapshot) => {
+      const data = await snapshot.val()
+      console.log(await data.idFactura)
+      setTiempo(await data.estado)
+
     })
   }
 
@@ -89,7 +89,7 @@ export default function Espera() {
         }}>
         Firebase
       </Button>
-      
+
       <Text>{tiempo}</Text>
     </View>
   )
