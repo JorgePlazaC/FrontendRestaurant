@@ -1,9 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useContext } from 'react'
+import { SnapshotViewIOS, StyleSheet, Text, View } from 'react-native'
+import React, { useContext, useState, useEffect } from 'react'
 import { StackActions } from '@react-navigation/native'
 import { withNavigation } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, onValue, ref, set } from 'firebase/database'
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -13,8 +15,42 @@ export default function Espera() {
   const navigation = useNavigation()
 
   //UseContext
-  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext, idPedido, setIdPedido } = useContext(RestaurantContext)
 
+  //UseState
+  const [tiempo,setTiempo] = useState("00:00")
+
+  //UseEfect
+  useEffect(() => {
+    () => {
+      //fetchFirebase()
+    };
+  }, [])
+
+  //Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDUG_OZb0A9YEJQmCI1iqK4NIyIR8w5qp0",
+    authDomain: "restaurant-22e6c.firebaseapp.com",
+    projectId: "restaurant-22e6c",
+    storageBucket: "restaurant-22e6c.appspot.com",
+    messagingSenderId: "327222016651",
+    appId: "1:327222016651:web:9da1b280e9e290307cb28e",
+    measurementId: "G-XCGSTZWQY3"
+  }
+
+  const app = initializeApp(firebaseConfig)
+
+  //Obtener tiempo
+  const fetchFirebase = () => {
+    const db = getDatabase()
+    const reference = ref(db, 'pedidos/' + idPedido)
+    onValue(reference, (snapshot) =>{
+      const data = snapshot.val()
+      console.log(data.idFactura)
+      setTiempo(data.estado)
+    
+    })
+  }
 
   //Volver al menú de compra
   const SeguirComprando = () => {
@@ -45,6 +81,16 @@ export default function Espera() {
         }}>
         Volver a pedir
       </Button>
+      <Button
+        mode="contained"
+        style={styles.buttonPaper}
+        onPress={() => {
+          fetchFirebase()
+        }}>
+        Firebase
+      </Button>
+      
+      <Text>{tiempo}</Text>
     </View>
   )
 }
@@ -62,7 +108,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 10,
-    marginBottom:8,
+    marginBottom: 8,
     fontSize: 18,
   },
 })

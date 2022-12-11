@@ -3,6 +3,9 @@ import React, { useState, useEffect, useContext } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
 import { TextInput, Divider, Portal, Dialog, Button } from 'react-native-paper';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set } from 'firebase/database'
+import firestore from '@react-native-firebase/firestore';
 
 import RestaurantContext from '../src/components/RestaurantContext'
 
@@ -16,10 +19,22 @@ export default function Resumen({ navigation }) {
   const urlPedido = `${baseUrl}/api/pedidos`
 
   //UseContext
-  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext } = useContext(RestaurantContext)
+  const { mesa, setMesa, carro, setCarro, carroAgregado, setCarroAgregado, imagenes, setImagenes, productosContext, setProductosContext, idPedido, setIdPedido } = useContext(RestaurantContext)
 
   let total = 0
 
+  //Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDUG_OZb0A9YEJQmCI1iqK4NIyIR8w5qp0",
+    authDomain: "restaurant-22e6c.firebaseapp.com",
+    projectId: "restaurant-22e6c",
+    storageBucket: "restaurant-22e6c.appspot.com",
+    messagingSenderId: "327222016651",
+    appId: "1:327222016651:web:9da1b280e9e290307cb28e",
+    measurementId: "G-XCGSTZWQY3"
+  }
+
+  const app = initializeApp(firebaseConfig)
 
   useEffect(() => {
 
@@ -48,6 +63,19 @@ export default function Resumen({ navigation }) {
         const response = await axios.post(urlPedido, { idMesa: mesa, idFactura: facturaId, idProducto: prod.producto.id, cantidad: prod.cantidad });
         console.log(await response.data)
       })
+
+      
+      const db = getDatabase()
+      const reference = ref(db, 'pedidos/' + facturaId)
+
+      set(reference, {
+        idFactura: facturaId,
+        productos: carro,
+        estado: "Ingresado",
+        mesa: mesa,
+        tiempo: "",
+      })
+      setIdPedido(facturaId)
 
     } catch (error) {
       console.log(error)
