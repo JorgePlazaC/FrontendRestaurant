@@ -75,7 +75,7 @@ export default function Espera() {
     <View style={styles.viewBody}>
       {tiempo > 0 ? (
         <View>
-          <Text style={styles.text}>Su producto está en preparación</Text>
+          <Text style={styles.text}>Su pedido está en preparación</Text>
           <CountDown
             until={tiempo}
             timeToShow={['M', 'S']}
