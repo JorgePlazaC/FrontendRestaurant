@@ -411,8 +411,8 @@ const styles = StyleSheet.create({
   },
   sectionList: {
     backgroundColor: '#F2F2F2',
-    minHeight: width.height - 120,
-    maxHeight: width.height - 120,
+    minHeight: width.height - 135,
+    maxHeight: width.height - 135,
   },
   buttonPaper: {
     marginTop: 3,

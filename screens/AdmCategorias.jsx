@@ -340,8 +340,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   flatList: {
-    minHeight: width.height - 150,
-    maxHeight: width.height - 150,
+    minHeight: width.height - 170,
+    maxHeight: width.height - 170,
   },
   buttonPaper: {
     marginTop: 3,
